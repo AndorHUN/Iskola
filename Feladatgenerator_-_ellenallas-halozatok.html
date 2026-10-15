@@ -1,0 +1,3495 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ellenállás-hálózatok – feladatgenerátor és gyakorló</title>
+<style>
+:root{--bg:#f3f6fb;--paper:#fff;--ink:#172033;--muted:#627087;--blue:#1769aa;--cyan:#14a6bd;--line:#d9e3ef;--green:#157347;--red:#b3261e;--shadow:0 12px 32px rgba(27,48,77,.09);
+--lv1:#157347;--lv2:#0f8b8d;--lv3:#b7791f;--lv4:#c2410c;--lv5:#9b1c4a}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:linear-gradient(135deg,#edf4fb,#f8fafc);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink);line-height:1.6}
+header{padding:30px 20px 24px;background:#10243b;color:#fff;border-bottom:4px solid var(--cyan)}
+header .wrap,main,.tabs .wrap{max-width:1100px;margin:auto}
+header h1{font-size:clamp(1.5rem,4vw,2.4rem);line-height:1.15;margin:0 0 8px}
+header p{color:#cbd8e7;margin:0;max-width:780px}
+.tabs{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);box-shadow:0 4px 14px rgba(27,48,77,.06)}
+.tabs .wrap{display:flex;gap:8px;overflow-x:auto;padding:10px 18px;scrollbar-width:thin}
+.tab{border:1px solid var(--line);background:#f4f8fc;color:#29435e;padding:8px 16px;border-radius:999px;font:600 .95rem Inter,Segoe UI,Arial,sans-serif;cursor:pointer;white-space:nowrap}
+.tab:hover{background:#e8f1fa}
+.tab[aria-selected=true]{background:#10243b;color:#fff;border-color:#10243b}
+.tab:focus-visible,.btn:focus-visible,.seg button:focus-visible,.chip:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #7cc4f4;outline-offset:2px}
+main{padding:22px 18px 50px;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+.pane[hidden]{display:none}
+.pane{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,3vw,28px);box-shadow:var(--shadow);min-width:0}
+h2{font-size:1.3rem;margin:0 0 10px}
+h3{font-size:1.05rem;margin:18px 0 8px;color:#17466b}
+h4{margin:0}
+.intro{color:var(--muted);margin-top:-2px}
+.small{font-size:.88rem;color:var(--muted)}
+.err{color:var(--red);font-weight:600}
+a{color:var(--blue)}
+
+/* gombok, kapcsolók */
+.btn{border:1.5px solid #b9c8da;background:#fff;color:#17466b;padding:9px 16px;border-radius:10px;font:600 .95rem Inter,Segoe UI,Arial,sans-serif;cursor:pointer;transition:background .15s,border-color .15s}
+.btn:hover{background:#eef5fc;border-color:#8fb1d4}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:#12558c}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sm{padding:5px 10px;font-size:.85rem;border-radius:8px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+.seg{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.seg button{flex:1 1 130px;border:2px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;font:600 .95rem Inter,Segoe UI,Arial,sans-serif;cursor:pointer;color:#29435e;text-align:left}
+.seg button small{display:block;font-weight:500;color:var(--muted);font-size:.78rem}
+.seg button:hover{background:#f4f8fc}
+.seg button[aria-checked=true]{color:#fff;border-color:transparent}
+.seg button[aria-checked=true] small{color:rgba(255,255,255,.85)}
+.seg .l1[aria-checked=true]{background:var(--lv1)}.seg .l2[aria-checked=true]{background:var(--lv2)}.seg .l3[aria-checked=true]{background:var(--lv3)}.seg .l4[aria-checked=true]{background:var(--lv4)}.seg .l5[aria-checked=true]{background:var(--lv5)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{border:1.5px solid var(--line);background:#f4f8fc;color:#29435e;border-radius:999px;padding:5px 13px;font:600 .88rem Inter,Segoe UI,Arial,sans-serif;cursor:pointer}
+.chip[aria-pressed=true]{background:#10243b;color:#fff;border-color:#10243b}
+.chip .n{opacity:.7;font-weight:500;margin-left:4px}
+.badge{display:inline-block;border-radius:99px;padding:2px 11px;font-size:.8rem;font-weight:700;background:#e0f7f8;color:#086a78;margin-right:6px}
+.badge.lv{color:#fff}.badge.lv1{background:var(--lv1)}.badge.lv2{background:var(--lv2)}.badge.lv3{background:var(--lv3)}.badge.lv4{background:var(--lv4)}.badge.lv5{background:var(--lv5)}
+.badge.fz{background:#fff3cd;color:#7a5b00}
+.pid{float:right;font-size:.8rem;color:var(--muted);font-family:Consolas,Menlo,monospace}
+.ctrl-top{display:flex;gap:18px;justify-content:space-between;flex-wrap:wrap;align-items:flex-start}.ctrl-top>div:first-child{flex:1 1 420px}.score{flex:0 0 auto}
+.score{background:#f4f8fc;border:1px solid #e0eaf4;border-radius:12px;padding:10px 14px;font-size:.9rem;min-width:220px}
+.score strong{font-size:1.1rem}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.9rem}
+.field>span,.field legend{font-weight:700;color:#29435e}
+fieldset.field{border:0;padding:0;margin:0}
+input[type=text],input[type=number],select,textarea{font:inherit;padding:8px 10px;border:1.5px solid #b9c8da;border-radius:8px;background:#fff;color:var(--ink);max-width:100%}
+input[type=number]{width:6.5em}
+input.ok{border-color:var(--green);background:#effaf3}
+input.bad,select.bad{border-color:var(--red);background:#fdf1f0}
+select.ok{border-color:var(--green);background:#effaf3}
+.adv{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:6px 14px;background:#fafcfe}
+.adv summary{cursor:pointer;font-weight:700;color:#17466b;padding:8px 0}
+.adv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px 22px;padding:8px 0 12px}
+.checks{display:flex;flex-direction:column;gap:4px}
+.checks label{display:flex;gap:8px;align-items:center;font-weight:500}
+.inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* feladatkártya */
+.problem{scroll-margin-top:72px}
+.problem .stmt{font-size:1.04rem;margin:6px 0 12px}
+.diagram-wrap{background:#fffdf5;border:1px solid #e8dfc7;border-radius:14px;padding:10px;overflow:hidden;background-image:linear-gradient(#d9e6f3 1px,transparent 1px),linear-gradient(90deg,#d9e6f3 1px,transparent 1px);background-size:24px 24px}
+svg{display:block;width:100%;height:auto;max-height:430px}
+.big svg{max-height:640px}
+.wire{fill:none;stroke:#24364b;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.res{fill:#fffdf5;stroke:#24364b;stroke-width:3}.node{fill:#24364b}
+.label{font:700 19px Segoe UI,Arial,sans-serif;fill:#172033}.source{fill:#fffdf5;stroke:#24364b;stroke-width:3}.source-mark{font:700 22px Segoe UI,Arial,sans-serif;fill:#1769aa}
+.ann{font:600 15px Segoe UI,Arial,sans-serif;fill:#0b5a67}.arrowhead{fill:#1769aa}.igtext{font:700 19px Segoe UI,Arial,sans-serif;fill:#1769aa}
+.data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}
+.datum{padding:10px 13px;border-radius:12px;background:#f4f8fc;border:1px solid #e0eaf4}
+.datum span{display:block;font-size:.82rem;color:var(--muted)}.datum strong{font-size:1.05rem}
+.asks{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:10px 20px}
+.ask{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ask .alabel{font-family:Cambria,"Times New Roman",serif;font-size:1.08rem;min-width:2.4em;font-weight:600}
+.ask input{width:7.8em}
+.ask .aunit{font-weight:600;color:#29435e}
+.ask-choice{grid-column:1/-1}
+.ask-choice .alabel{font-family:inherit;font-size:1rem}
+.amark{font-weight:800;min-width:1.2em}
+.amark.ok{color:var(--green)}.amark.bad{color:var(--red)}
+.amark small{font-weight:600;color:#42556d}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 6px}
+.feedback{min-height:1.6em;font-weight:600;margin:6px 0}
+.feedback.ok{color:var(--green)}.feedback.bad{color:var(--red)}
+.hints .step,.solution .step{animation:fadein .3s}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* levezetés (a korábbi oldalak stílusa) */
+.step{border-left:4px solid var(--cyan);padding:3px 0 4px 16px;margin:20px 0}
+.formula{background:#f3f8fc;border:1px solid #dfebf5;border-radius:10px;padding:11px 14px;margin:8px 0;font-family:Cambria,"Times New Roman",serif;font-size:1.06rem;overflow-wrap:anywhere}
+.answer{color:var(--green);font-weight:800}
+.note{background:#fff8df;border:1px solid #f0df9f;padding:11px 14px;border-radius:10px;color:#5f4b0c;margin:12px 0}
+.why{background:#e9f7f9;border:1px solid #bfe6ec;padding:11px 14px;border-radius:10px;color:#0b4f5c;margin:10px 0}
+.warn{background:#fdecec;border:1px solid #f3c2c2;padding:11px 14px;border-radius:10px;color:#6b1d1d;margin:10px 0}
+hr.thin{border:0;border-top:1px dashed var(--line);margin:16px 0}
+.stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;margin-top:12px}
+.stage{margin:0;min-width:0}.stage svg{max-height:340px}
+.stage figcaption{font-size:.92rem;color:#42556d;padding:8px 4px 0}.stage figcaption strong{color:#17466b}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{background:#f1f6fb;color:#29435e}.num{text-align:right}
+tfoot td{background:#f1f9f3;border-top:2px solid #bfe0cc;color:var(--green)}
+.pill{display:inline-block;background:#e0f7f8;color:#086a78;border-radius:99px;padding:3px 10px;font-size:.82rem;font-weight:700}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:12px 0}
+.rule{border:1px solid #dfebf5;border-radius:12px;padding:12px 16px;background:#f8fbfe}
+.rule h4{font-size:1rem;color:#17466b;margin-bottom:6px}.rule ul{margin:0;padding-left:20px}.rule li{margin:4px 0}
+.card ul,.card ol{padding-left:22px}.card li{margin:4px 0}
+
+/* feladatbank */
+.filters{display:grid;gap:6px}
+.bank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:14px}
+.bank-card{display:flex;flex-direction:column;gap:6px;text-align:left;border:1.5px solid var(--line);border-radius:14px;background:#fff;padding:10px;cursor:pointer;font:inherit;color:inherit}
+.bank-card:hover{border-color:#8fb1d4;box-shadow:0 6px 18px rgba(27,48,77,.08)}
+.bank-card.done{border-color:#9fd3b4;background:#f6fcf8}
+.bank-card .thumb{border-radius:10px;overflow:hidden;background:#fffdf5;border:1px solid #efe7cf;height:120px;display:flex;align-items:center;justify-content:center}
+.bank-card .thumb svg{max-height:116px;width:auto;max-width:100%;min-width:0!important}
+.bank-card strong{font-size:.98rem;line-height:1.3}
+.bank-card .meta{font-size:.8rem}
+
+/* kísérletező */
+.expr{font-family:Consolas,Menlo,monospace;font-size:1.05rem;min-width:min(100%,360px);flex:1}
+.lab-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px 26px;margin-top:10px}
+.slider-row{display:grid;grid-template-columns:3.2em minmax(90px,1fr) 8.5em;gap:10px;align-items:center;margin:6px 0}
+.slider-row label{font-family:Cambria,"Times New Roman",serif;font-weight:700;font-size:1.05rem}
+.slider-row input[type=range]{width:100%;accent-color:var(--blue)}
+.slider-row input[type=text]{width:100%}
+details.fold{border:1px solid var(--line);border-radius:12px;padding:6px 14px;margin:12px 0;background:#fafcfe}
+details.fold summary{cursor:pointer;font-weight:700;color:#17466b;padding:6px 0}
+
+/* feladatlap */
+.sheet{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px}
+.sheet .sh-title{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-bottom:2px solid #17466b;margin-bottom:14px;padding-bottom:8px}
+.sheet .sh-title h2{margin:0}
+.sheet .blank{display:inline-block;min-width:11em;border-bottom:1.5px solid #555;height:1.1em}
+.wsp{border-bottom:1px dashed var(--line);padding:14px 0;break-inside:avoid}
+.wsp-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.wsp-h .no{font-weight:800;font-size:1.1rem;color:#17466b}
+.wsp .diagram-wrap{padding:4px}
+.wsp svg{max-height:300px}
+.wsp-asks{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px 18px;margin-top:8px}
+.wsp-asks .line{font-family:Cambria,"Times New Roman",serif;font-size:1.05rem}
+.wsp-asks .line i{display:inline-block;min-width:5.5em;border-bottom:1.5px solid #555;height:1em;vertical-align:-2px}
+.key{page-break-before:always;break-before:page}
+.diag .why{margin:6px 0}
+.key table{font-size:.9rem}
+.key td{vertical-align:top}
+
+footer{text-align:center;color:var(--muted);font-size:.9rem;padding:0 18px 30px}
+@media(max-width:620px){
+  header{padding-top:24px}
+  .diagram-wrap{padding:2px;overflow-x:auto}
+  svg.wide{min-width:640px}
+  .stages{grid-template-columns:minmax(0,1fr)}.stage svg{max-width:none!important}
+  .label{font-size:22px}.ann{font-size:17px}
+  th,td{padding:8px 6px;font-size:.9rem}
+  .formula{font-size:1rem}
+  .asks{grid-template-columns:minmax(0,1fr)}
+  .slider-row{grid-template-columns:2.8em minmax(70px,1fr) 7em}
+  .pid{float:none;display:block;margin-top:4px}
+}
+@page{margin:14mm}
+@media print{
+  body{background:#fff;font-size:11pt}
+  header,.tabs,footer,.ctrl,.actions,.feedback,.hints,.no-print,.score,.b-print{display:none!important}
+  main{padding:0}
+  .card{box-shadow:none;border:0;padding:0}
+  .problem .asks input,.problem .asks select{border:0;border-bottom:1.2px solid #555;border-radius:0;background:#fff}
+  .diagram-wrap{background-color:#fff;background-image:none;border:1px solid #ccc}
+  .sheet{border:0;padding:0}
+  .wsp{break-inside:avoid}
+  svg{max-height:260px}
+  .key{break-before:page}
+  a{color:inherit;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Ellenállás-hálózatok – feladatgenerátor és gyakorló</h1>
+  <p>Villanyszerelői elektrotechnika: soros, párhuzamos és vegyes kapcsolások gyakorlása. Végtelen sok generált feladat öt nehézségi szinten, kidolgozott példafeladatok, saját kapcsolás kísérletező és nyomtatható feladatlap – minden feladathoz lépésről lépésre levezetéssel.</p>
+</div></header>
+
+<nav class="tabs" aria-label="Fejezetek"><div class="wrap" role="tablist">
+  <button class="tab" role="tab" id="tab-gen" data-tab="gen" aria-selected="true" aria-controls="pane-gen">Generátor</button>
+  <button class="tab" role="tab" id="tab-bank" data-tab="bank" aria-selected="false" aria-controls="pane-bank">Feladatbank</button>
+  <button class="tab" role="tab" id="tab-lab" data-tab="lab" aria-selected="false" aria-controls="pane-lab">Kísérletező</button>
+  <button class="tab" role="tab" id="tab-sheet" data-tab="sheet" aria-selected="false" aria-controls="pane-sheet">Feladatlap</button>
+  <button class="tab" role="tab" id="tab-ref" data-tab="ref" aria-selected="false" aria-controls="pane-ref">Képletek</button>
+</div></nav>
+
+<main id="main">
+
+<!-- ===================== GENERÁTOR ===================== -->
+<section class="pane" id="pane-gen" role="tabpanel" aria-labelledby="tab-gen">
+  <div class="card ctrl">
+    <div class="ctrl-top">
+      <div>
+        <h2>Feladatgenerátor</h2>
+        <p class="intro">Válassz nehézségi szintet, és kapj végtelen sok új feladatot. Írd be a válaszaidat, ellenőrizd őket, kérj tippet (lépésenként), vagy nézd meg a teljes levezetést. Minden feladat azonosítóval (seed) megosztható és újragenerálható.</p>
+      </div>
+      <div class="score" id="score" aria-live="polite"></div>
+    </div>
+    <div class="seg" id="levelSeg" role="radiogroup" aria-label="Nehézségi szint"></div>
+    <p class="small" id="levelDesc"></p>
+    <div class="row">
+      <button class="btn primary" id="btnNew" type="button">Új feladat</button>
+      <label class="inline small">Azonosító:
+        <input type="text" id="seedInput" inputmode="numeric" size="9" aria-label="Feladat azonosítója (seed)">
+      </label>
+      <button class="btn" id="btnLoadSeed" type="button">Betöltés</button>
+      <button class="btn" id="btnLink" type="button">Link másolása</button>
+      <span class="small" id="linkMsg" role="status"></span>
+    </div>
+    <details class="adv" id="adv">
+      <summary>Haladó beállítások (paraméterek)</summary>
+      <div class="adv-grid" id="advGrid"></div>
+      <div class="row"><button class="btn sm" id="btnResetOpts" type="button">Visszaállítás a szint alapértékeire</button><span class="small" id="optsNote"></span></div>
+    </details>
+  </div>
+  <div id="genHost"></div>
+</section>
+
+<!-- ===================== FELADATBANK ===================== -->
+<section class="pane" id="pane-bank" role="tabpanel" aria-labelledby="tab-bank" hidden>
+  <div id="bankHost"></div>
+  <div class="card" id="bankCard">
+    <h2>Feladatbank – kidolgozott példafeladatok</h2>
+    <p class="intro">Válogatott feladatok témakörönként, könnyűtől a nehézig: Ohm törvénye, soros, párhuzamos és vegyes kapcsolás, osztók, műszeres feladatok, teljesítmény, hibakeresés és méretezés. A füzet feladatai is itt vannak. Kattints egy kártyára a megoldáshoz.</p>
+    <div class="filters">
+      <div class="chips" id="bankTopics" aria-label="Témakör"></div>
+      <div class="chips" id="bankLevels" aria-label="Nehézség"></div>
+    </div>
+    <p class="small" id="bankCount"></p>
+    <div class="bank-grid" id="bankList"></div>
+  </div>
+</section>
+
+<!-- ===================== KÍSÉRLETEZŐ ===================== -->
+<section class="pane" id="pane-lab" role="tabpanel" aria-labelledby="tab-lab" hidden>
+  <div class="card">
+    <h2>Kísérletező – saját kapcsolás</h2>
+    <p class="intro">Írd le a kapcsolást kifejezéssel, állítsd be az ellenállások értékét csúszkával, és azonnal látod a feszültségeket, áramokat és a teljes levezetést. Jelölés: <strong>R1, R2, …</strong> az ellenállások (1–9), <strong>+</strong> a soros, <strong>|</strong> a párhuzamos kapcsolás (a | erősebben köt, mint a +), zárójellel csoportosíthatsz.</p>
+    <div class="row">
+      <input type="text" id="labExpr" class="expr" value="R1+(R2|R3)" spellcheck="false" autocomplete="off" aria-label="Kapcsolás kifejezése">
+      <button class="btn primary" id="labApply" type="button">Rajzol</button>
+    </div>
+    <div class="chips" id="labPresets" aria-label="Minták"></div>
+    <p class="err" id="labErr" role="alert"></p>
+    <div class="lab-grid">
+      <div id="labSliders"></div>
+      <div id="labKnown"></div>
+    </div>
+  </div>
+  <div id="labOut"></div>
+</section>
+
+<!-- ===================== FELADATLAP ===================== -->
+<section class="pane" id="pane-sheet" role="tabpanel" aria-labelledby="tab-sheet" hidden>
+  <div class="card ctrl no-print">
+    <h2>Nyomtatható feladatlap</h2>
+    <p class="intro">Állíts össze gyakorlólapot (házi feladat, dolgozat-előkészítő), nyomtasd ki, és a megoldókulcsot külön oldalra teheted. Ugyanazzal az azonosítóval ugyanaz a lap generálódik újra.</p>
+    <div class="adv-grid" id="sheetGrid"></div>
+    <div class="row">
+      <button class="btn primary" id="sheetGen" type="button">Feladatlap generálása</button>
+      <button class="btn" id="sheetPrint" type="button">Nyomtatás</button>
+      <button class="btn" id="sheetNewSeed" type="button">Új azonosító</button>
+      <span class="small" id="sheetMsg" role="status"></span>
+    </div>
+  </div>
+  <div id="sheetOut"></div>
+</section>
+
+<!-- ===================== KÉPLETEK ===================== -->
+<section class="pane" id="pane-ref" role="tabpanel" aria-labelledby="tab-ref" hidden>
+  <div class="card">
+    <h2>Alapösszefüggések</h2>
+    <div class="data-grid">
+      <div class="datum"><span>Ohm törvénye</span><strong>U = R · I</strong></div>
+      <div class="datum"><span>Áramerősség</span><strong>I = U / R</strong></div>
+      <div class="datum"><span>Ellenállás</span><strong>R = U / I</strong></div>
+      <div class="datum"><span>Teljesítmény</span><strong>P = U · I</strong></div>
+      <div class="datum"><span>Teljesítmény</span><strong>P = I² · R</strong></div>
+      <div class="datum"><span>Teljesítmény</span><strong>P = U² / R</strong></div>
+      <div class="datum"><span>Munka, energia</span><strong>W = P · t</strong></div>
+    </div>
+    <h3>Előtagok</h3>
+    <p>1 kΩ = 1000 Ω &nbsp;·&nbsp; 1 MΩ = 1000 kΩ &nbsp;·&nbsp; 1 A = 1000 mA &nbsp;·&nbsp; 1 mA = 1000 µA &nbsp;·&nbsp; 1 V = 1000 mV &nbsp;·&nbsp; 1 kW = 1000 W. Ha az ellenállás kΩ-ban és a feszültség V-ban van, az áram mA-ban jön ki (V / kΩ = mA).</p>
+  </div>
+  <div class="card">
+    <h2>Soros és párhuzamos kapcsolás</h2>
+    <div class="rules">
+      <div class="rule"><h4><span class="pill">soros</span> kapcsolás</h4>
+        <ul>
+          <li>Az elemek <strong>egyetlen úton</strong> következnek egymás után, közöttük nincs elágazás.</li>
+          <li><strong>Az áram azonos</strong>: I = I₁ = I₂ = …</li>
+          <li><strong>A feszültségek összeadódnak</strong>: U = U₁ + U₂ + …</li>
+          <li><strong>Az ellenállások összeadódnak</strong>: Rₑ = R₁ + R₂ + …</li>
+          <li><strong>Feszültségosztó</strong>: U₁ = U · R₁ / (R₁ + R₂)</li>
+        </ul></div>
+      <div class="rule"><h4><span class="pill">párhuzamos</span> kapcsolás</h4>
+        <ul>
+          <li>Az elemek <strong>ugyanarra a két csomópontra</strong> csatlakoznak.</li>
+          <li><strong>A feszültség azonos</strong>: U = U₁ = U₂ = …</li>
+          <li><strong>Az áramok összeadódnak</strong>: I = I₁ + I₂ + …</li>
+          <li><strong>A vezetések összeadódnak</strong>: 1/Rₑ = 1/R₁ + 1/R₂ + …</li>
+          <li>Két ellenállás: Rₑ = (R₁ · R₂) / (R₁ + R₂); n egyforma ellenállás: Rₑ = R / n</li>
+          <li><strong>Áramosztó</strong>: I₁ = I · R₂ / (R₁ + R₂) (az átellenes ellenállás a számlálóban)</li>
+          <li>Az eredő mindig <strong>kisebb</strong> a legkisebb ágellenállásnál.</li>
+        </ul></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Vegyes kapcsolás – a megoldás menete</h2>
+    <ol>
+      <li><strong>Értelmezd a rajzot:</strong> jelöld a csomópontokat. Két elem <em>párhuzamos</em>, ha ugyanazt a két csomópontot kötik össze; <em>soros</em>, ha a közös pontjukon nincs elágazás.</li>
+      <li><strong>Egyszerűsíts belülről kifelé:</strong> a legbelső soros vagy párhuzamos csoportot cseréld ki egyetlen helyettesítő ellenállásra, és ismételd, amíg egyetlen Rₑ marad.</li>
+      <li><strong>Teljes áram:</strong> Iᵍ = Uᵍ / Rₑ (vagy fordítva: Uᵍ = Iᵍ · Rₑ, ha az áram ismert).</li>
+      <li><strong>Bontsd vissza kifelé → befelé:</strong> soros csoportban az áram közös (U = R · I), párhuzamos csoportban a feszültség közös (I = U / R).</li>
+      <li><strong>Ellenőrizd:</strong> Kirchhoff I. és II. törvénye, a teljesítménymérleg (Pᵍ = ΣP) és a józan ész (az eredő a legkisebb ágnál kisebb, a soros részek feszültsége összeadódik).</li>
+    </ol>
+    <h3>Visszafelé (fordított) feladatok</h3>
+    <p>Ha nem a generátor, hanem egy belső érték ismert (műszer által mutatott feszültség vagy áram), a mért elemtől indulunk, és kifelé haladunk a generátor felé: Ohm törvényével feszültségből áramot vagy áramból feszültséget számolunk, soros csoportban az áram, párhuzamos csoportban a feszültség közös, a szomszédos ágak értékeit kiszámoljuk, és így tovább, amíg a generátorhoz nem érünk.</p>
+    <h3>Hiányzó ellenállás</h3>
+    <p>A kívánt eredőből indulunk, és az ismeretlent tartalmazó csoportokon át haladunk felé: soros csoportnál <strong>kivonjuk</strong> a többi részt (R<sub>x</sub> = R<sub>csoport</sub> − ΣR<sub>többi</sub>), párhuzamos csoportnál a <strong>vezetéseket vonjuk ki</strong> (1/R<sub>x</sub> = 1/R<sub>csoport</sub> − Σ1/R<sub>többi</sub>).</p>
+  </div>
+  <div class="card">
+    <h2>Kirchhoff törvényei</h2>
+    <ul>
+      <li><strong>I. (csomóponti) törvény:</strong> egy csomópontba befolyó áramok összege egyenlő a kifolyó áramok összegével: ΣI<sub>be</sub> = ΣI<sub>ki</sub>.</li>
+      <li><strong>II. (huroktörvény):</strong> zárt hurokban a feszültségek előjeles összege nulla; a generátorfeszültség egyenlő a hálózaton végighaladva mért feszültségek összegével.</li>
+    </ul>
+    <h3>Mérőműszerek</h3>
+    <ul>
+      <li><strong>Voltmérő:</strong> a mérendő elemmel <em>párhuzamosan</em> kötjük, ideális belső ellenállása végtelen (nem vesz fel áramot).</li>
+      <li><strong>Ampermérő:</strong> a mérendő ággal <em>sorosan</em> kötjük, ideális belső ellenállása nulla.</li>
+      <li><strong>Voltmérő méréshatár-bővítése</strong> (soros előtét): R<sub>e</sub> = (n − 1) · R<sub>m</sub>, ahol n a méréshatár-szorzó.</li>
+      <li><strong>Ampermérő méréshatár-bővítése</strong> (párhuzamos sönt): R<sub>s</sub> = R<sub>m</sub> / (n − 1).</li>
+    </ul>
+    <h3>Hibák hatása</h3>
+    <ul>
+      <li><strong>Szakadás:</strong> az érintett ág kiesik; az eredő ellenállás nő, az áram csökken. Soros láncban az egész áramkör megszakad (I = 0), a teljes feszültség a szakadáson jelenik meg.</li>
+      <li><strong>Rövidzár:</strong> az elem ellenállása 0 Ω; az eredő ellenállás csökken, az áram nő (veszélyes túláram, ezért védelem kell).</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+<footer>Egyetlen önálló HTML-fájl, internet nélkül is működik · A feladatok és megoldások a böngészőben, pontos törtekkel számolódnak.</footer>
+
+<script>
+(function () {
+'use strict';
+/* ============================================================
+   1. Pontos törtek (BigInt) – a számolás hibamentes marad,
+      és eldönthető, hogy egy érték "kerek" (véges tizedes tört)-e.
+   ============================================================ */
+function bgcd(a, b) {
+  if (a < 0n) a = -a;
+  if (b < 0n) b = -b;
+  while (b) { const t = a % b; a = b; b = t; }
+  return a;
+}
+
+class Fr {
+  constructor(n, d) {
+    n = typeof n === 'bigint' ? n : BigInt(n);
+    d = d === undefined ? 1n : (typeof d === 'bigint' ? d : BigInt(d));
+    if (d === 0n) throw new Error('Nullával osztás');
+    if (d < 0n) { n = -n; d = -d; }
+    const g = bgcd(n, d);
+    if (g > 1n) { n /= g; d /= g; }
+    this.n = n;
+    this.d = d;
+  }
+
+  static of(x) {
+    if (x instanceof Fr) return x;
+    if (typeof x === 'bigint') return new Fr(x);
+    if (typeof x === 'number') {
+      if (!isFinite(x)) throw new Error('Érvénytelen szám');
+      if (Number.isInteger(x)) return new Fr(BigInt(x));
+      return Fr.parse(String(x));
+    }
+    if (typeof x === 'string') return Fr.parse(x);
+    throw new Error('Érvénytelen érték');
+  }
+
+  static parse(s) {
+    s = String(s).trim().replace(',', '.');
+    const m = /^([+-]?)(\d*)(?:\.(\d*))?(?:e([+-]?\d+))?$/i.exec(s);
+    if (!m || (m[2] === '' && !m[3])) throw new Error('Érvénytelen szám: ' + s);
+    const frac = m[3] || '';
+    let n = BigInt((m[2] || '0') + frac);
+    let d = 10n ** BigInt(frac.length);
+    if (m[4]) {
+      const e = parseInt(m[4], 10);
+      if (e >= 0) n *= 10n ** BigInt(e); else d *= 10n ** BigInt(-e);
+    }
+    if (m[1] === '-') n = -n;
+    return new Fr(n, d);
+  }
+
+  add(o) { o = Fr.of(o); return new Fr(this.n * o.d + o.n * this.d, this.d * o.d); }
+  sub(o) { o = Fr.of(o); return new Fr(this.n * o.d - o.n * this.d, this.d * o.d); }
+  mul(o) { o = Fr.of(o); return new Fr(this.n * o.n, this.d * o.d); }
+  div(o) { o = Fr.of(o); if (o.n === 0n) throw new Error('Nullával osztás'); return new Fr(this.n * o.d, this.d * o.n); }
+  neg() { return new Fr(-this.n, this.d); }
+  inv() { return new Fr(this.d, this.n); }
+  abs() { return this.n < 0n ? this.neg() : this; }
+  cmp(o) { o = Fr.of(o); const l = this.n * o.d, r = o.n * this.d; return l < r ? -1 : l > r ? 1 : 0; }
+  eq(o) { return this.cmp(o) === 0; }
+  lt(o) { return this.cmp(o) < 0; }
+  le(o) { return this.cmp(o) <= 0; }
+  gt(o) { return this.cmp(o) > 0; }
+  ge(o) { return this.cmp(o) >= 0; }
+  isZero() { return this.n === 0n; }
+  sign() { return this.n < 0n ? -1 : this.n > 0n ? 1 : 0; }
+
+  /** közelítő lebegőpontos érték */
+  num() {
+    const n = Number(this.n), d = Number(this.d);
+    if (isFinite(n) && isFinite(d)) return n / d;
+    const bits = Math.max(this.n.toString(2).length, this.d.toString(2).length);
+    const sh = BigInt(Math.max(0, bits - 900));
+    return Number(this.n >> sh) / Number(this.d >> sh);
+  }
+
+  /** hány tizedesjegy kell a pontos kiíráshoz? (Infinity, ha nem véges tizedes tört) */
+  decimals() {
+    let d = this.d, a = 0, b = 0;
+    while (d % 2n === 0n) { d /= 2n; a++; }
+    while (d % 5n === 0n) { d /= 5n; b++; }
+    return d === 1n ? Math.max(a, b) : Infinity;
+  }
+  isTerminating() { return this.decimals() !== Infinity; }
+
+  /** tizedes tört szövegként ('.' tizedesponttal); véges tizedesnél pontos, egyébként k jegyre kerekített */
+  toDecimal(k) {
+    const dec = this.decimals();
+    if (k === undefined) k = dec === Infinity ? 12 : dec;
+    const neg = this.n < 0n;
+    const a = neg ? -this.n : this.n;
+    const scale = 10n ** BigInt(k);
+    const q = (2n * a * scale + this.d) / (2n * this.d);   // kerekítés
+    let s = q.toString();
+    if (k > 0) {
+      s = s.padStart(k + 1, '0');
+      s = s.slice(0, s.length - k) + '.' + s.slice(s.length - k);
+    }
+    return (neg && q !== 0n ? '-' : '') + s;
+  }
+}
+
+const FR0 = new Fr(0n);
+const FR1 = new Fr(1n);
+const F = (x, y) => (y === undefined ? Fr.of(x) : new Fr(BigInt(x), BigInt(y)));
+const frSum = arr => arr.reduce((a, b) => a.add(b), FR0);
+const frMin = arr => arr.reduce((a, b) => (b.lt(a) ? b : a));
+const frMax = arr => arr.reduce((a, b) => (b.gt(a) ? b : a));
+const bLcm = (a, b) => (a === 0n || b === 0n ? 0n : (a / bgcd(a, b)) * b);
+
+/** az n-ből a 2 és 5 tényezők elhagyása */
+function stripTwoFive(n) {
+  if (n < 0n) n = -n;
+  if (n === 0n) return 0n;
+  while (n % 2n === 0n) n /= 2n;
+  while (n % 5n === 0n) n /= 5n;
+  return n;
+}
+
+/** csak a megadott kis prímek szerepelnek-e a prímtényezők között? */
+function onlySmallPrimes(n, primes) {
+  if (n < 0n) n = -n;
+  if (n === 0n) return true;
+  for (const p of primes) {
+    const bp = BigInt(p);
+    while (n % bp === 0n) n /= bp;
+  }
+  return n === 1n;
+}
+
+/* ============================================================
+   2. Hálózat-modell: soros–párhuzamos fa
+      t = 'R' (ellenállás), 'E' (helyettesítő ellenállás), 'S' (soros), 'P' (párhuzamos)
+   ============================================================ */
+let _nid = 0;
+function mkNode(t, props) {
+  return Object.assign({ t, id: ++_nid, c: [], v: null, p: null }, props || {});
+}
+const Rleaf = (i, v) => mkNode('R', { i, v: v == null ? null : Fr.of(v) });
+const Sn = c => mkNode('S', { c });
+const Pn = c => mkNode('P', { c });
+const Eleaf = (name, v, idxs) => mkNode('E', { name, v, idxs: idxs || [] });
+const isLeaf = n => n.t === 'R' || n.t === 'E';
+
+const SUBD = '₀₁₂₃₄₅₆₇₈₉';
+function subs(s) {
+  return String(s).replace(/[0-9]/g, d => SUBD[d]).replace(/x/g, 'ₓ').replace(/e/g, 'ₑ');
+}
+
+/** azonos típusú egymásba ágyazás összevonása, egygyermekes csomópontok megszüntetése */
+function norm(n) {
+  if (isLeaf(n)) return n;
+  const kids = [];
+  for (const c0 of n.c) {
+    const c = norm(c0);
+    if (c.t === n.t) kids.push(...c.c); else kids.push(c);
+  }
+  if (kids.length === 1) return kids[0];
+  n.c = kids;
+  return n;
+}
+
+function clone(n) {
+  const m = Object.assign({}, n, { id: ++_nid, p: null });
+  m.c = n.c.map(clone);
+  return m;
+}
+
+function leafIdxName(idxs) {
+  const a = Array.from(new Set(idxs)).sort((x, y) => x - y);
+  if (a.length <= 4) return 'R' + subs(a.join(''));
+  return 'R' + subs(a[0]) + '₋' + subs(a[a.length - 1]);
+}
+
+/** szülő/magasság/név/eredő számítás – minden szerkezeti változtatás után meg kell hívni */
+function prep(root) {
+  (function rec(n, p, d) { n.p = p; n.depth = d; n.c.forEach(c => rec(c, n, d + 1)); })(root, null, 0);
+  (function up(n) {
+    n.c.forEach(up);
+    if (isLeaf(n)) {
+      n.h = 0;
+      n.idxs = n.t === 'R' ? [n.i] : (n.idxs || []);
+    } else {
+      n.h = 1 + Math.max(...n.c.map(c => c.h));
+      n.idxs = [].concat(...n.c.map(c => c.idxs));
+    }
+    if (n.t === 'R') n.name = n.x ? 'Rₓ' : 'R' + subs(n.i);
+    else if (n.t === 'S' || n.t === 'P') n.name = leafIdxName(n.idxs);
+    n.sfx = n.t === 'R' ? (n.x ? 'ₓ' : subs(n.i)) : n.name.slice(1);
+  })(root);
+  if (!isLeaf(root)) root.name = 'Rₑ';          // a teljes hálózat eredője
+  calcR(root);
+  return root;
+}
+
+function calcR(n) {
+  if (isLeaf(n)) {
+    if (!n.v) throw new Error('Hiányzik az ellenállás értéke: ' + (n.name || n.i));
+    n.r = n.v;
+    return n.r;
+  }
+  const rs = n.c.map(calcR);
+  if (n.t === 'S') {
+    n.r = frSum(rs);
+  } else {
+    n.g = frSum(rs.map(r => r.inv()));
+    n.r = n.g.inv();
+  }
+  return n.r;
+}
+
+/** a gyökérnél ismert U vagy I alapján minden csomópont U és I értéke */
+function solveTree(root, known) {
+  if (known.U) { root.U = known.U; root.I = known.U.div(root.r); }
+  else { root.I = known.I; root.U = known.I.mul(root.r); }
+  (function down(n) {
+    if (isLeaf(n)) return;
+    for (const c of n.c) {
+      if (n.t === 'S') { c.I = n.I; c.U = c.r.mul(n.I); }
+      else { c.U = n.U; c.I = n.U.div(c.r); }
+      down(c);
+    }
+  })(root);
+  return root;
+}
+
+function walk(n, fn) { fn(n); n.c.forEach(c => walk(c, fn)); }
+function allNodes(root) { const a = []; walk(root, n => a.push(n)); return a; }
+function leavesOf(root) { return allNodes(root).filter(isLeaf); }
+function rLeaves(root) { return allNodes(root).filter(n => n.t === 'R'); }
+function leafBy(root, i) { return rLeaves(root).find(n => n.i === i); }
+
+/** szélességi bejárás a belső (összetett) csomópontokra */
+function compositesBFS(root) {
+  const out = [], q = [root];
+  while (q.length) {
+    const n = q.shift();
+    if (!isLeaf(n)) { out.push(n); n.c.forEach(c => q.push(c)); }
+  }
+  return out;
+}
+
+function pathTo(root, idx) {
+  const leaf = leafBy(root, idx);
+  const path = [];
+  for (let n = leaf; n; n = n.p) path.unshift(n);
+  return path;
+}
+
+function toExpr(n) {
+  if (n.t === 'R') return 'R' + n.i;
+  if (n.t === 'E') return n.name;
+  const sep = n.t === 'S' ? '+' : '|';
+  return n.c.map(c => {
+    const s = toExpr(c);
+    return !isLeaf(c) ? '(' + s + ')' : s;
+  }).join(sep);
+}
+
+/* ---------- kifejezés-elemző (soros: +, párhuzamos: | vagy || vagy ∥) ---------- */
+function parseExpr(src) {
+  const text = String(src).replace(/∥|‖/g, '|').replace(/\|\|/g, '|').replace(/\s+/g, '');
+  if (!text) throw new Error('Üres kifejezés. Példa: R1+(R2|R3)');
+  const toks = [];
+  for (let i = 0; i < text.length;) {
+    const ch = text[i];
+    if (ch === '+' || ch === '|' || ch === '(' || ch === ')') { toks.push(ch); i++; continue; }
+    if (ch === 'R' || ch === 'r') {
+      let j = i + 1;
+      while (j < text.length && /\d/.test(text[j])) j++;
+      if (j === i + 1) throw new Error('Az „R” után sorszámot kell írni (pl. R1).');
+      toks.push('R' + text.slice(i + 1, j));
+      i = j;
+      continue;
+    }
+    throw new Error('Ismeretlen jel: „' + ch + '”. Használható: R1, R2, … , +  (soros),  |  (párhuzamos),  zárójel.');
+  }
+  let p = 0;
+  function expr() {
+    const kids = [term()];
+    while (toks[p] === '+') { p++; kids.push(term()); }
+    return kids.length === 1 ? kids[0] : Sn(kids);
+  }
+  function term() {
+    const kids = [factor()];
+    while (toks[p] === '|') { p++; kids.push(factor()); }
+    return kids.length === 1 ? kids[0] : Pn(kids);
+  }
+  function factor() {
+    const t = toks[p];
+    if (t === '(') {
+      p++;
+      const e = expr();
+      if (toks[p] !== ')') throw new Error('Hiányzik a záró zárójel.');
+      p++;
+      return e;
+    }
+    if (t && t[0] === 'R') {
+      p++;
+      const i = parseInt(t.slice(1), 10);
+      if (i < 1 || i > 9) throw new Error('Az ellenállások sorszáma 1 és 9 között lehet.');
+      return Rleaf(i);
+    }
+    throw new Error(t ? 'Váratlan jel: „' + t + '”.' : 'A kifejezés váratlanul véget ért.');
+  }
+  const tree = expr();
+  if (p < toks.length) throw new Error('Váratlan jel: „' + toks[p] + '”.');
+  const idx = rLeaves(tree).map(l => l.i);
+  if (new Set(idx).size !== idx.length) throw new Error('Minden ellenállás sorszáma csak egyszer szerepelhet.');
+  return norm(tree);
+}
+
+/* ---------- hibák: szakadás (open) és rövidzár (short) ---------- */
+function applyFault(root, idx, kind) {
+  const OPEN = { o: 1 }, SHORT = { s: 1 };
+  function rec(n) {
+    if (n.t === 'R') {
+      if (n.i === idx) return kind === 'open' ? OPEN : SHORT;
+      return clone(n);
+    }
+    const res = n.c.map(rec);
+    if (n.t === 'S') {
+      if (res.includes(OPEN)) return OPEN;
+      const f = res.filter(x => x !== SHORT);
+      if (f.length === 0) return SHORT;
+      if (f.length === 1) return f[0];
+      return Sn(f);
+    }
+    if (res.includes(SHORT)) return SHORT;
+    const f = res.filter(x => x !== OPEN);
+    if (f.length === 0) return OPEN;
+    if (f.length === 1) return f[0];
+    return Pn(f);
+  }
+  const r = rec(root);
+  if (r === OPEN || r === SHORT) return null;
+  const t = norm(r);
+  prep(t);
+  return t;
+}
+
+/* ---------- egyszerűsítési körök (a legbelső csoportoktól kifelé) ---------- */
+function collapseRound(root) {
+  const reds = [];
+  function rec(n) {
+    if (isLeaf(n)) return clone(n);
+    if (n.h === 1) {
+      reds.push({ node: n, type: n.t, name: n.name, kids: n.c.map(c => ({ name: c.name, r: c.r })), r: n.r });
+      return Eleaf(n.name, n.r, n.idxs);
+    }
+    return mkNode(n.t, { c: n.c.map(rec) });
+  }
+  const t = rec(root);
+  prep(t);
+  return { tree: t, reds };
+}
+
+function stagesOf(root) {
+  const out = [];
+  let cur = root;
+  while (!isLeaf(cur)) {
+    const s = collapseRound(cur);
+    out.push(s);
+    cur = s.tree;
+  }
+  return out;
+}
+
+/** összetett csomópontok magasság szerint csoportosítva (1, 2, …) – az eredő számítás sorrendje */
+function compositesByHeight(root) {
+  const map = new Map();
+  walk(root, n => {
+    if (!isLeaf(n)) {
+      if (!map.has(n.h)) map.set(n.h, []);
+      map.get(n.h).push(n);
+    }
+  });
+  return Array.from(map.keys()).sort((a, b) => a - b).map(h => map.get(h));
+}
+
+const typeHu = n => (n.t === 'S' ? 'soros' : 'párhuzamos');
+
+/* ============================================================
+   3. Számformázás magyar szokás szerint, mértékegységek, bevitel értelmezése
+   ============================================================ */
+const NB = ' ';
+
+function groupInt(s) { return s.replace(/\B(?=(\d{3})+(?!\d))/g, NB); }
+
+function decStrToHu(s) {            // '-1234.50' → '−1 234,50'
+  let neg = false;
+  if (s[0] === '-') { neg = true; s = s.slice(1); }
+  const [ip, fp] = s.split('.');
+  return (neg ? '−' : '') + groupInt(ip) + (fp ? ',' + fp : '');
+}
+
+/** x lebegőpontos szám, sig értékes jegyre kerekítve, a záró nullák nélkül */
+function fmtSig(x, sig) {
+  if (!isFinite(x)) return '∞';
+  if (x === 0) return '0';
+  const a = Math.abs(x);
+  const mag = Math.floor(Math.log10(a));
+  const dec = Math.min(15, Math.max(0, sig - 1 - mag));
+  let s = a.toFixed(dec);
+  if (s.indexOf('.') >= 0) s = s.replace(/0+$/, '').replace(/\.$/, '');
+  if (parseFloat(s) === 0) return '0';
+  return decStrToHu((x < 0 ? '-' : '') + s);
+}
+
+function fmtFixed(x, d) {
+  let s = Math.abs(x).toFixed(d);
+  const neg = x < 0 && parseFloat(s) !== 0;
+  return decStrToHu((neg ? '-' : '') + s);
+}
+
+/** Fr kiírása: véges tizedes tört pontosan (ha nem túl hosszú), egyébként sig értékes jegyre */
+function fmtFr(f, sig = 5) {
+  f = Fr.of(f);
+  if (f.isZero()) return '0';
+  const dec = f.decimals();
+  if (dec !== Infinity && dec <= 8) {
+    const s = f.toDecimal(dec);
+    const digits = s.replace('-', '').replace('.', '').replace(/^0+/, '').length;
+    if (digits <= sig + 3) return decStrToHu(s);
+  }
+  return fmtSig(f.num(), sig);
+}
+
+/* ---------- mértékegységek ---------- */
+const UNIT_SCALE = {
+  kV: F(1000), V: F(1), mV: F(1, 1000), 'µV': F(1, 1000000),
+  A: F(1), mA: F(1, 1000), 'µA': F(1, 1000000),
+  'MΩ': F(1000000), 'kΩ': F(1000), 'Ω': F(1),
+  kW: F(1000), W: F(1), mW: F(1, 1000), 'µW': F(1, 1000000),
+  '%': F(1), '': F(1)
+};
+const BASE_UNIT = { V: 'V', A: 'A', R: 'Ω', P: 'W', '%': '%' };
+
+function bestUnit(kind, x) {
+  const a = Math.abs(typeof x === 'number' ? x : x.num());
+  switch (kind) {
+    case 'V': return a >= 1000 ? 'kV' : (a >= 0.1 || a === 0) ? 'V' : a >= 1e-4 ? 'mV' : 'µV';
+    case 'A': return a >= 1 ? 'A' : a >= 1e-3 || a === 0 ? (a === 0 ? 'A' : 'mA') : 'µA';
+    case 'R': return a >= 1e6 ? 'MΩ' : a >= 1e3 ? 'kΩ' : 'Ω';
+    case 'P': return a >= 1000 ? 'kW' : a >= 1 || a === 0 ? 'W' : a >= 1e-3 ? 'mW' : 'µW';
+    default: return BASE_UNIT[kind] || '';
+  }
+}
+
+/** érték a legkényelmesebb előtaggal, pl. 282,4 mA */
+function fmtQ(f, kind, sig = 4) {
+  f = Fr.of(f);
+  const u = bestUnit(kind, f);
+  return fmtFr(f.div(UNIT_SCALE[u]), sig) + NB + u;
+}
+/** érték SI alapegységben, pl. 0,28235 A */
+function fmtBase(f, kind, sig = 5) {
+  return fmtFr(f, sig) + NB + BASE_UNIT[kind];
+}
+/** alapegységben, és ha az előtag eltér, mellette a kényelmes alak: 0,28235 A ≈ 282,35 mA */
+function ansQ(f, kind, sig = 5) {
+  f = Fr.of(f);
+  const base = fmtBase(f, kind, sig);
+  const u = bestUnit(kind, f);
+  if (u === BASE_UNIT[kind]) return base;
+  const conv = f.div(UNIT_SCALE[u]);
+  const exact = conv.isTerminating() && conv.decimals() <= 8;
+  return base + ' ' + (exact ? '=' : '≈') + ' ' + fmtFr(conv, 4) + NB + u;
+}
+/** szám egység nélkül, számítási sorokhoz */
+const nb = (f, sig = 5) => fmtFr(f, sig);
+
+function listNames(names) {
+  if (names.length === 1) return names[0];
+  return names.slice(0, -1).join(', ') + ' és ' + names[names.length - 1];
+}
+
+/* ---------- a felhasználó által beírt érték értelmezése ---------- */
+const UNIT_PARSE = {
+  V: { kv: 1e3, v: 1, mv: 1e-3, uv: 1e-6, 'µv': 1e-6, 'μv': 1e-6 },
+  A: { a: 1, ma: 1e-3, ua: 1e-6, 'µa': 1e-6, 'μa': 1e-6, ka: 1e3 },
+  R: { 'ω': 1, ohm: 1, 'kω': 1e3, k: 1e3, kohm: 1e3, 'mω': 1e6, m: 1e6, 'mohm': 1e6 },
+  P: { w: 1, mw: 1e-3, kw: 1e3, uw: 1e-6, 'µw': 1e-6, 'μw': 1e-6 },
+  '%': { '%': 1 }
+};
+
+/** kind: 'V' | 'A' | 'R' | 'P' | '%'; defUnit: az input melletti egység. Visszatérés: SI érték vagy null */
+function parseQty(str, kind, defUnit) {
+  let s = String(str).trim().replace(/ /g, ' ');
+  if (!s) return null;
+  s = s.replace(/[−–]/g, '-').replace(/,/g, '.').replace(/(\d)\s+(?=\d)/g, '$1');
+  const m = /^([+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)\s*([^\d\s]*)$/i.exec(s);
+  if (!m) return null;
+  const num = parseFloat(m[1]);
+  if (!isFinite(num)) return null;
+  let u = m[2];
+  if (!u) return num * (UNIT_SCALE[defUnit] ? UNIT_SCALE[defUnit].num() : 1);
+  const key = u.toLowerCase();
+  const tab = UNIT_PARSE[kind] || {};
+  if (kind === 'R' && key === 'm' && /M/.test(u)) return num * 1e6;
+  if (tab[key] !== undefined) return num * tab[key];
+  return null;
+}
+
+/* ============================================================
+   4. Levezetés-generátor: bármely soros–párhuzamos hálózathoz
+      lépésről lépésre magyarázatot állít elő (HTML).
+   ============================================================ */
+const hP = s => `<p>${s}</p>`;
+const hF = (s, cls) => `<div class="formula${cls ? ' ' + cls : ''}">${s}</div>`;
+const hA = s => hF(s, 'answer');
+const hWhy = (s, t) => `<div class="why"><strong>${t || 'Miért?'}</strong> ${s}</div>`;
+const hNote = (s, t) => `<div class="note"><strong>${t || 'Fontos:'}</strong> ${s}</div>`;
+const aspan = s => `<span class="answer">${s}</span>`;
+const hr = () => '<hr class="thin">';
+
+const symU = n => (n.p ? 'U' + n.sfx : 'Uᵍ');
+const symI = n => (n.p ? 'I' + n.sfx : 'Iᵍ');
+
+function roundSigNum(x, sig) { return Number(x.toPrecision(sig)); }
+/** a kerekített tagok összege egyezik-e a kerekített összeggel ('=' vagy '≈') */
+function eqSign(items, total, sig = 5) {
+  const s = items.reduce((a, f) => a + roundSigNum(f.num(), sig), 0);
+  const t = roundSigNum(total.num(), sig);
+  const tol = Math.abs(t) * Math.pow(10, 1 - sig) * 0.5001;
+  return Math.abs(s - t) <= tol ? '=' : '≈';
+}
+
+class Sol {
+  constructor(root) {
+    this.root = root;
+    this.steps = [];
+    this.shown = new Set();
+    this.intro = '';
+    this.figs = [];        // további ábrák a megoldáshoz: {caption, tree}
+  }
+  add(title, ...parts) { this.steps.push({ title, html: parts.join('') }); }
+}
+
+/* ---------- az eredő ellenállás számítása (belülről kifelé) ---------- */
+function reduceBlock(n) {
+  const kids = n.c;
+  const names = kids.map(k => k.name);
+  let h = '';
+  if (n.t === 'S') {
+    h += hP(`${listNames(names)} <strong>sorosan</strong> vannak kötve (egymás után, közöttük nincs elágazás), ezért az ellenállásaik összeadódnak.`);
+    h += hF(`${n.name} = ${names.join(' + ')}`);
+    h += hF(`${n.name} = ${kids.map(k => nb(k.r)).join(' + ')}`);
+    h += hA(`${n.name} = ${ansQ(n.r, 'R')}`);
+  } else if (kids.length === 2) {
+    const [a, b] = kids;
+    h += hP(`${a.name} és ${b.name} <strong>párhuzamosan</strong> vannak kötve (ugyanarra a két csomópontra csatlakoznak). Két párhuzamos ellenállás eredője a szorzatuk osztva az összegükkel.`);
+    h += hF(`${n.name} = (${a.name} · ${b.name}) / (${a.name} + ${b.name})`);
+    h += hF(`${n.name} = (${nb(a.r)} · ${nb(b.r)}) / (${nb(a.r)} + ${nb(b.r)}) = ${nb(a.r.mul(b.r))} / ${nb(a.r.add(b.r))}`);
+    h += hA(`${n.name} = ${ansQ(n.r, 'R')}`);
+    h += hWhy(`${nb(n.r, 4)} Ω &lt; ${nb(frMin(kids.map(k => k.r)), 4)} Ω, vagyis kisebb a legkisebb ágellenállásnál – így kell lennie párhuzamos kapcsolásnál.`, 'Józan ész ellenőrzés:');
+  } else {
+    h += hP(`${listNames(names)} <strong>párhuzamosan</strong> vannak kötve (ugyanarra a két csomópontra csatlakoznak). Kettőnél több ágnál a reciprokok (vezetések, G = 1/R) adódnak össze:`);
+    h += hF(`1/${n.name} = ${names.map(x => '1/' + x).join(' + ')}`);
+    h += hF(`1/${n.name} = ${kids.map(k => '1/' + nb(k.r)).join(' + ')} = ${kids.map(k => nb(k.r.inv())).join(' + ')} = ${nb(n.g)} S`);
+    if (n.g.d < 1000000n && n.g.d !== 1n) h += hF(`1/${n.name} = ${n.g.n}/${n.g.d} S`);
+    h += hA(`${n.name} = 1 / ${nb(n.g)} = ${ansQ(n.r, 'R')}`);
+    h += hWhy(`${nb(n.r, 4)} Ω &lt; ${nb(frMin(kids.map(k => k.r)), 4)} Ω, tehát kisebb a legkisebb ágnál. A végén ne felejtsd <strong>visszafordítani</strong> a reciprokot!`, 'Józan ész ellenőrzés:');
+  }
+  return h;
+}
+
+function reduceTitle(nodes) {
+  if (nodes.length === 1) {
+    const n = nodes[0];
+    return n.p ? `${n.name} – ${typeHu(n)} eredő` : `Az eredő ellenállás (Rₑ) – ${typeHu(n)} kapcsolás`;
+  }
+  return 'Az egyszerűsítés – ' + listNames(nodes.map(n => n.name)) + ' eredője';
+}
+
+function emitReduceGroup(sol, nodes) {
+  nodes.forEach(n => sol.shown.add(n.id));
+  sol.add(reduceTitle(nodes), nodes.map(reduceBlock).join(hr()));
+}
+
+/** az n részfa még meg nem mutatott összetett csomópontjai egyetlen lépésben (post-order) */
+function emitReduceTree(sol, n, title) {
+  const nodes = [];
+  (function post(x) {
+    if (isLeaf(x)) return;
+    x.c.forEach(post);
+    if (!sol.shown.has(x.id)) nodes.push(x);
+  })(n);
+  if (!nodes.length) return;
+  nodes.forEach(x => sol.shown.add(x.id));
+  const t = title || (nodes.length === 1 ? reduceTitle(nodes) : `${n.name} meghatározása (belülről kifelé haladva)`);
+  sol.add(t, nodes.map(reduceBlock).join(hr()));
+}
+
+function emitAllReductions(sol) {
+  compositesByHeight(sol.root).forEach(g => emitReduceGroup(sol, g));
+}
+
+/* ---------- feszültségek és áramok szétosztása (kifelé → befelé) ---------- */
+function propagate(n) {
+  if (isLeaf(n)) return;
+  for (const c of n.c) {
+    if (n.t === 'S') { c.I = n.I; c.U = c.r.mul(n.I); }
+    else { c.U = n.U; c.I = n.U.div(c.r); }
+    propagate(c);
+  }
+}
+
+function sumLine(kids, symFn, valFn, total, kind, totalSym) {
+  const items = kids.map(valFn);
+  return `${kids.map(symFn).join(' + ')} = ${items.map(f => nb(f)).join(' + ')} ${eqSign(items, total)} ${nb(total)} ${BASE_UNIT[kind]} (${totalSym})`;
+}
+
+function distBody(n) {
+  const kids = n.c;
+  const names = kids.map(k => k.name);
+  let h = '';
+  if (n.t === 'S') {
+    const where = n.p ? `Az ${n.name} soros részben` : 'A teljes áramkörben';
+    h += hP(`${where} ${listNames(names)} <strong>sorosan</strong> vannak kötve, ezért mindegyiken <strong>ugyanaz az áram</strong> folyik: ${symI(n)} = ${ansQ(n.I, 'A')}. A feszültségeket Ohm törvényével kapjuk (U = R · I):`);
+    kids.forEach(k => {
+      h += hF(`${symU(k)} = ${k.name} · ${symI(n)} = ${nb(k.r)} · ${nb(n.I)} = ${aspan(ansQ(k.U, 'V'))}`);
+    });
+    h += hP(`Kirchhoff II. (a feszültségek összege): ${sumLine(kids, symU, k => k.U, n.U, 'V', symU(n))}`);
+  } else {
+    const where = n.p ? `Az ${n.name} párhuzamos részben` : 'A teljes áramkörben';
+    h += hP(`${where} ${listNames(names)} <strong>párhuzamos</strong> ágak (ugyanarra a két csomópontra csatlakoznak), ezért mindegyiken <strong>ugyanaz a feszültség</strong> esik: ${symU(n)} = ${ansQ(n.U, 'V')}. Az ágáramokat Ohm törvényével kapjuk (I = U / R):`);
+    kids.forEach(k => {
+      h += hF(`${symI(k)} = ${symU(n)} / ${k.name} = ${nb(n.U)} / ${nb(k.r)} = ${aspan(ansQ(k.I, 'A'))}`);
+    });
+    h += hP(`Kirchhoff I. (az áramok összege): ${sumLine(kids, symI, k => k.I, n.I, 'A', symI(n))}`);
+  }
+  return h;
+}
+
+function distTitle(n) {
+  if (!n.p) return n.t === 'S' ? 'A soros részek feszültségei (a teljes áram közös)' : 'Az ágak áramai (a feszültség közös)';
+  return n.t === 'S' ? `${n.name} (soros rész) – feszültségek` : `${n.name} (párhuzamos rész) – ágáramok`;
+}
+
+function emitDistribution(sol) {
+  compositesBFS(sol.root).forEach(n => sol.add(distTitle(n), distBody(n)));
+}
+
+/* ---------- ellenőrző lépés ---------- */
+function loopLeaves(n, pick) {
+  if (isLeaf(n)) return [n];
+  if (n.t === 'S') return [].concat(...n.c.map(c => loopLeaves(c, pick)));
+  return loopLeaves(n.c[pick(n.c.length)], pick);
+}
+
+function emitChecks(sol) {
+  const root = sol.root;
+  let h = '';
+  if (!isLeaf(root)) {
+    const loops = [];
+    const a = loopLeaves(root, () => 0).map(x => x.id).join();
+    const b = loopLeaves(root, len => len - 1).map(x => x.id).join();
+    loops.push(loopLeaves(root, () => 0));
+    if (b !== a) loops.push(loopLeaves(root, len => len - 1));
+    h += hP('<strong>Kirchhoff II. törvénye a hurkokban:</strong> a generátorból kiindulva, a hálózaton végighaladva a feszültségek összege Uᵍ.');
+    loops.forEach(l => {
+      const items = l.map(x => x.U);
+      h += hF(`Uᵍ = ${l.map(symU).join(' + ')} = ${items.map(f => nb(f)).join(' + ')} ${eqSign(items, root.U)} ${nb(root.U)} V ${aspan('✓')}`);
+    });
+  }
+  const leaves = rLeaves(root);
+  const Ps = leaves.map(l => l.U.mul(l.I));
+  const Pg = root.U.mul(root.I);
+  h += hP('<strong>Teljesítménymérleg:</strong> a generátor teljesítménye egyenlő az ellenállásokon hővé alakuló teljesítmények összegével (P = U · I).');
+  h += hF(`Pᵍ = Uᵍ · Iᵍ = ${nb(root.U)} · ${nb(root.I)} = ${aspan(ansQ(Pg, 'P'))}`);
+  if (leaves.length > 1) {
+    h += hF(`${leaves.map(l => 'P' + l.sfx).join(' + ')} = ${Ps.map(f => nb(f, 4)).join(' + ')} ${eqSign(Ps, Pg, 4)} ${nb(Pg, 5)} W ${aspan('✓')}`);
+  }
+  h += hNote('A számítások pontos törtekkel készültek, a kijelzett számok csak a megjelenítéskor lettek kerekítve, ezért a kerekített számok összeadásakor az utolsó jegyben eltérés előfordulhat.', 'Megjegyzés:');
+  sol.add('Ellenőrzés – Kirchhoff törvényei és teljesítménymérleg', h);
+}
+
+/* ---------- előre számolás (Uᵍ vagy Iᵍ adott) ---------- */
+function solveForward(pr) {
+  const root = pr.tree;
+  const sol = new Sol(root);
+  const known = pr.given.Ug ? { U: pr.given.Ug } : { I: pr.given.Ig };
+  sol.intro = hP('<strong>Módszer.</strong> Belülről kifelé haladva a soros és a párhuzamos csoportokat egyetlen helyettesítő ellenállással váltjuk ki, amíg csak az eredő ellenállás (Rₑ) marad. Ezzel kiszámoljuk a generátor áramát (vagy feszültségét), majd visszafelé haladva minden csoport és ellenállás feszültségét és áramát meghatározzuk.');
+  emitAllReductions(sol);
+  if (known.U) {
+    solveTree(root, known);
+    sol.add('A generátor árama (Ohm törvénye)',
+      hP(`Az egész hálózat egyetlen Rₑ = ${ansQ(root.r, 'R')} ellenállásnak felel meg, amelyre a generátor Uᵍ = ${ansQ(root.U, 'V')} feszültséget kapcsol:`),
+      hF('Iᵍ = Uᵍ / Rₑ'),
+      hF(`Iᵍ = ${nb(root.U)} / ${nb(root.r)}`),
+      hA(`Iᵍ = ${ansQ(root.I, 'A')}`));
+  } else {
+    solveTree(root, known);
+    sol.add('A generátorfeszültség (Ohm törvénye)',
+      hP(`A generátor árama ismert: Iᵍ = ${ansQ(root.I, 'A')}. Az egész hálózat egyetlen Rₑ = ${ansQ(root.r, 'R')} ellenállásnak felel meg, ezért:`),
+      hF('Uᵍ = Iᵍ · Rₑ'),
+      hF(`Uᵍ = ${nb(root.I)} · ${nb(root.r)}`),
+      hA(`Uᵍ = ${ansQ(root.U, 'V')}`));
+  }
+  emitDistribution(sol);
+  emitChecks(sol);
+  return finishSol(sol);
+}
+
+/* ---------- visszafelé számolás egy ismert értékből (műszer) ---------- */
+function solveMeter(pr) {
+  const root = pr.tree;
+  const m = pr.given.meter;
+  const sol = new Sol(root);
+  const leaf = leafBy(root, m.leaf);
+  const isV = m.type === 'V';
+  sol.intro = hP('<strong>Módszer.</strong> Az egyetlen ismert értékből indulunk ki' + (m.draw === false ? '' : ' (az ideális ' + (isV ? 'voltmérő nem terheli a kapcsolást, mert végtelen nagy a belső ellenállása' : 'ampermérő nem változtatja meg a kört, mert a belső ellenállása nulla') + ')') + ', és lépésről lépésre a generátor felé haladunk: soros csoportban az áram közös (a feszültségek összeadódnak), párhuzamos csoportban a feszültség közös (az áramok összeadódnak). A végén előre számolva is ellenőrzünk.');
+
+  if (isV) {
+    leaf.U = m.value;
+    leaf.I = m.value.div(leaf.r);
+    sol.add(`A mért érték – ${leaf.name} árama`,
+      hP(`${m.draw === false ? 'Ismert, hogy az ' + leaf.name + ' ellenálláson' : 'A voltmérő az ' + leaf.name + ' ellenálláson'} ${ansQ(m.value, 'V')} feszültséget ${m.draw === false ? 'esik' : 'mutat'}: ${symU(leaf)} = ${ansQ(m.value, 'V')}. Ohm törvényéből (I = U / R):`),
+      hF(`${symI(leaf)} = ${symU(leaf)} / ${leaf.name} = ${nb(leaf.U)} / ${nb(leaf.r)}`),
+      hA(`${symI(leaf)} = ${ansQ(leaf.I, 'A')}`));
+  } else {
+    leaf.I = m.value;
+    leaf.U = leaf.r.mul(m.value);
+    sol.add(`A mért érték – ${leaf.name} feszültsége`,
+      hP(`${m.draw === false ? 'Ismert, hogy az ' + leaf.name + ' ellenálláson' : 'Az ampermérő az ' + leaf.name + ' ellenálláson'} ${m.draw === false ? 'átfolyó áram' : 'átfolyó áramot méri:'} ${symI(leaf)} = ${ansQ(m.value, 'A')}. Ohm törvényéből (U = R · I):`),
+      hF(`${symU(leaf)} = ${leaf.name} · ${symI(leaf)} = ${nb(leaf.r)} · ${nb(leaf.I)}`),
+      hA(`${symU(leaf)} = ${ansQ(leaf.U, 'V')}`));
+  }
+
+  let n = leaf;
+  while (n.p) {
+    const p = n.p;
+    const sibs = p.c.filter(x => x !== n);
+    sibs.forEach(s => { if (!isLeaf(s)) emitReduceTree(sol, s); });
+    let h = '';
+    if (p.t === 'S') {
+      sibs.forEach(s => { s.I = n.I; s.U = s.r.mul(s.I); propagate(s); });
+      p.U = frSum(p.c.map(c => c.U));
+      p.I = n.I;
+      h += hP(`${listNames(sibs.map(s => s.name))} ${sibs.length > 1 ? 'sorosan vannak kötve' : 'sorosan van kötve'} ${isLeaf(n) ? 'az ' + n.name + ' ellenállással' : 'az ' + n.name + ' résszel'} (${p.p ? 'az ' + p.name + ' soros részben' : 'a teljes áramkörben'}), ezért mindegyiken ugyanaz az áram folyik: ${symI(n)} = ${ansQ(n.I, 'A')}. A feszültségek (U = R · I):`);
+      sibs.forEach(s => { h += hF(`${symU(s)} = ${s.name} · ${symI(n)} = ${nb(s.r)} · ${nb(n.I)} = ${aspan(ansQ(s.U, 'V'))}`); });
+      sibs.forEach(s => { if (!isLeaf(s)) compositesBFS(s).forEach(x => { h += hr() + hP(`<em>${x.name} belseje:</em>`) + distBody(x); }); });
+      h += hP(`${p.p ? 'A csoport' : 'A generátor'} feszültsége a részek feszültségeinek összege (Kirchhoff II.), az árama pedig ugyanaz:`);
+      h += hF(`${symU(p)} = ${p.c.map(symU).join(' + ')} = ${p.c.map(c => nb(c.U)).join(' + ')} = ${aspan(ansQ(p.U, 'V'))}`);
+      h += hF(`${symI(p)} = ${symI(n)} = ${aspan(ansQ(p.I, 'A'))}`);
+      sol.add(`${p.p ? p.name : 'A teljes áramkör'} – soros rész`, h);
+    } else {
+      sibs.forEach(s => { s.U = n.U; s.I = s.U.div(s.r); propagate(s); });
+      p.I = frSum(p.c.map(c => c.I));
+      p.U = n.U;
+      h += hP(`${listNames(sibs.map(s => s.name))} ${sibs.length > 1 ? 'párhuzamosan vannak kötve' : 'párhuzamosan van kötve'} ${isLeaf(n) ? 'az ' + n.name + ' ellenállással' : 'az ' + n.name + ' résszel'} (${p.p ? 'az ' + p.name + ' párhuzamos részben' : 'a teljes áramkörben'}), ezért mindegyiken ugyanaz a feszültség esik: ${symU(n)} = ${ansQ(n.U, 'V')}. Az ágáramok (I = U / R):`);
+      sibs.forEach(s => { h += hF(`${symI(s)} = ${symU(n)} / ${s.name} = ${nb(n.U)} / ${nb(s.r)} = ${aspan(ansQ(s.I, 'A'))}`); });
+      sibs.forEach(s => { if (!isLeaf(s)) compositesBFS(s).forEach(x => { h += hr() + hP(`<em>${x.name} belseje:</em>`) + distBody(x); }); });
+      h += hP(`${p.p ? 'A csoport' : 'A generátor'} árama az ágáramok összege (Kirchhoff I.), a feszültsége ugyanaz:`);
+      h += hF(`${symI(p)} = ${p.c.map(symI).join(' + ')} = ${p.c.map(c => nb(c.I)).join(' + ')} = ${aspan(ansQ(p.I, 'A'))}`);
+      h += hF(`${symU(p)} = ${symU(n)} = ${aspan(ansQ(p.U, 'V'))}`);
+      sol.add(`${p.p ? p.name : 'A teljes áramkör'} – párhuzamos rész`, h);
+    }
+    n = p;
+  }
+
+  sol.add('A generátor adatai',
+    hP('Az áramkör legkülső szintjére értünk, így a generátor feszültsége és árama már ismert:'),
+    hA(`Uᵍ = ${ansQ(root.U, 'V')}`),
+    hA(`Iᵍ = ${ansQ(root.I, 'A')}`));
+
+  emitReduceTree(sol, root, 'Ellenőrzés előre számolva – az eredő ellenállás');
+  const chk = hP('Most megfordítjuk az irányt: a megtalált Uᵍ-ból az eredő ellenállással kiszámoljuk az áramot, és össze kell, hogy egyezzen a visszafelé kapottal.')
+    + hF(`Iᵍ = Uᵍ / Rₑ = ${nb(root.U)} / ${nb(root.r)} = ${ansQ(root.U.div(root.r), 'A')}`)
+    + hA(`${nb(root.U.div(root.r))} A = ${nb(root.I)} A ${'✓'}`);
+  sol.add('Ellenőrzés előre számolva – az áram', chk);
+  emitChecks(sol);
+  return finishSol(sol);
+}
+
+/* ---------- hiányzó ellenállás ---------- */
+function solveDesign(pr) {
+  const root = pr.tree;
+  const d = pr.design;
+  const sol = new Sol(root);
+  const xLeaf = leafBy(root, d.x);
+  sol.intro = hP('<strong>Módszer.</strong> A keresett ellenállást Rₓ-szel jelöljük. A célból (az eredő ellenállásból) indulunk, és az Rₓ-et tartalmazó csoportokon át haladunk Rₓ felé: soros csoportnál kivonjuk a többi részt, párhuzamos csoportnál a vezetésekből vonjuk ki a többi ág vezetését. Végül ellenőrzünk.');
+
+  let need;
+  if (d.target.Re) {
+    need = d.target.Re;
+    sol.add('A cél: az eredő ellenállás',
+      hP(`A feladat szerint a kapcsolás eredő ellenállása Rₑ = ${ansQ(need, 'R')} legyen.`));
+  } else {
+    need = d.Ug.div(d.target.Ig);
+    sol.add('A cél: az eredő ellenállás',
+      hP(`A generátor árama Iᵍ = ${ansQ(d.target.Ig, 'A')} legyen, a feszültség Uᵍ = ${ansQ(d.Ug, 'V')}. Ohm törvényéből a szükséges eredő ellenállás:`),
+      hF('Rₑ = Uᵍ / Iᵍ'),
+      hF(`Rₑ = ${nb(d.Ug)} / ${nb(d.target.Ig)}`),
+      hA(`Rₑ = ${ansQ(need, 'R')}`));
+  }
+
+  const path = pathTo(root, d.x);
+  for (let j = 0; j < path.length - 1; j++) {
+    const n = path[j], child = path[j + 1];
+    const sibs = n.c.filter(c => c !== child);
+    sibs.forEach(s => { if (!isLeaf(s)) emitReduceTree(sol, s); });
+    const sibNames = sibs.map(s => s.name);
+    let h = '', childNeed;
+    const whole = n.p ? n.name : 'Rₑ';
+    const allNames = sibNames.concat([child.name]);
+    const what = child === xLeaf ? 'a keresett ellenállás' : `az ${child.name} rész (amelyben a keresett Rₓ van)`;
+    const where = n.p ? `Az ${n.name} részben` : 'A teljes hálózatban';
+    if (n.t === 'S') {
+      const sum = frSum(sibs.map(s => s.r));
+      childNeed = need.sub(sum);
+      h += hP(`${where} ${listNames(allNames)} <strong>sorosan</strong> vannak kötve, ezért ${whole} = ${allNames.join(' + ')}. A szükséges érték ${whole} = ${nb(need)} Ω, így ${what} ellenállása:`);
+      h += hF(`${child.name} = ${whole} − ${sibNames.join(' − ')}`);
+      h += hF(`${child.name} = ${nb(need)} − ${sibs.map(s => nb(s.r)).join(' − ')}`);
+      h += hA(`${child.name} = ${ansQ(childNeed, 'R')}`);
+    } else {
+      const gs = frSum(sibs.map(s => s.r.inv()));
+      const gneed = need.inv().sub(gs);
+      childNeed = gneed.inv();
+      h += hP(`${where} ${listNames(allNames)} <strong>párhuzamosan</strong> vannak kötve, ezért 1/${whole} = ${allNames.map(x => '1/' + x).join(' + ')}. A szükséges érték ${whole} = ${nb(need)} Ω; ${what} vezetése a különbségből adódik:`);
+      h += hF(`1/${child.name} = 1/${whole} − ${sibNames.map(x => '1/' + x).join(' − ')}`);
+      h += hF(`1/${child.name} = 1/${nb(need)} − ${sibs.map(s => '1/' + nb(s.r)).join(' − ')} = ${nb(need.inv())} − ${sibs.map(s => nb(s.r.inv())).join(' − ')} = ${nb(gneed)} S`);
+      h += hA(`${child.name} = 1 / ${nb(gneed)} = ${ansQ(childNeed, 'R')}`);
+    }
+    sol.add(`${n.p ? n.name : 'Rₑ'} (${typeHu(n)} ${n.p ? 'rész' : 'kapcsolás'}) → ${child.name}`, h);
+    need = childNeed;
+  }
+
+  // ellenőrzés a kapott értékkel: az eredő előre kiszámolva
+  sol.rx = need;
+  const rest = [];
+  (function post(x) { if (isLeaf(x)) return; x.c.forEach(post); if (!sol.shown.has(x.id)) rest.push(x); })(root);
+  const target = d.target.Re || d.Ug.div(d.target.Ig);
+  let ck = hP(`A keresett érték: Rₓ = ${ansQ(need, 'R')}. Ellenőrzésként a kapott Rₓ-szel előre kiszámoljuk a hálózat eredő ellenállását, és a célértéket kell kapnunk:`);
+  ck += rest.map(reduceBlock).join(hr());
+  ck += hA(`${nb(root.r)} Ω = ${nb(target)} Ω ${root.r.eq(target) ? '✓' : '✗'}`);
+  ck += hF(`Iᵍ = Uᵍ / Rₑ = ${nb(d.Ug)} / ${nb(root.r)} = ${ansQ(d.Ug.div(root.r), 'A')}`);
+  sol.add('Ellenőrzés – az eredő a kapott Rₓ-szel', ck);
+  solveTree(root, { U: d.Ug });
+  sol.final = { Ug: d.Ug, Ig: root.I, Re: root.r, Pg: root.U.mul(root.I) };
+  sol.tree = root;
+  sol.noTable = false;
+  return sol;
+}
+
+/* ---------- hibakeresés: szakadás / rövidzár ---------- */
+function solveFault(pr) {
+  const f = pr.fault;
+  const t0 = pr.tree;
+  const sol = new Sol(t0);
+  const Ug = f.Ug;
+  const t1 = applyFault(t0, f.leaf, f.kind);
+  const faulty = leafBy(t0, f.leaf);
+  sol.intro = hP('<strong>Módszer.</strong> Először kiszámoljuk az eredeti (hibátlan) kapcsolás eredőjét és áramát. Ezután megvizsgáljuk, mit jelent a hiba (szakadásnál az ág kiesik, rövidzárnál az elem helyén vezeték lesz), kiszámoljuk az új eredőt és áramot, végül összehasonlítjuk.');
+
+  // 1. az eredeti kapcsolás
+  const groups0 = compositesByHeight(t0);
+  const all0 = [].concat(...groups0);
+  sol.add('Az eredeti kapcsolás eredő ellenállása', all0.length ? all0.map(reduceBlock).join(hr()) : hP('Egyetlen ellenállásról van szó.'));
+  solveTree(t0, { U: Ug });
+  const Re0 = t0.r, Ig0 = t0.I;
+  sol.add('Az eredeti áram (hiba előtt)',
+    hF('Iᵍ = Uᵍ / Rₑ'),
+    hF(`Iᵍ = ${nb(Ug)} / ${nb(Re0)}`),
+    hA(`Iᵍ = ${ansQ(Ig0, 'A')}`));
+
+  // 2. a hiba
+  const left = new Set(rLeaves(t1).map(l => l.i));
+  const gone = rLeaves(t0).filter(l => !left.has(l.i) && l.i !== f.leaf).map(l => l.name);
+  let desc;
+  if (f.kind === 'open') {
+    desc = `Az ${faulty.name} ellenállás <strong>megszakad</strong> (szakadás), ezért rajta nem folyik áram` + (gone.length ? `, és vele együtt ${listNames(gone)} sem vezet (ugyanabban a soros ágban vannak)` : '') + '. Az érintett ág kiesik a hálózatból, a többi rész változatlanul működik.';
+  } else {
+    desc = `Az ${faulty.name} ellenállás <strong>rövidre záródik</strong> (rövidzár): ellenállása 0 Ω, helyén tulajdonképpen vezeték van` + (gone.length ? `, és a vele párhuzamos ágak (${listNames(gone)}) is kizáródnak, hiszen a rövidzáron keresztül az áram minden ellenállást „megkerül”` : '') + '. Az elem kikerül a számításból, a többi rész marad.';
+  }
+  const t1fig = treeSvg(t1, { arrows: false, ugText: `Uᵍ = ${fmtQ(Ug, 'V')}`, aria: 'A hibás kapcsolás' });
+  sol.add('A hiba hatása a kapcsolásra', hP(desc), hP('Az így kapott helyettesítő kapcsolás (az eredeti sorszámozással):'), `<div class="diagram-wrap">${t1fig}</div>`);
+  sol.figs.push({ caption: `A hibás kapcsolás (${faulty.name} ${f.kind === 'open' ? 'szakadás' : 'rövidzár'}) – az eredeti sorszámozással`, tree: t1 });
+
+  // 3. az új eredő
+  t1.name = 'Rₑʹ';
+  const groups1 = compositesByHeight(t1);
+  const all1 = [].concat(...groups1);
+  const txt1 = all1.map(reduceBlock).join(hr());
+  sol.add('Az új eredő ellenállás (hiba után)', all1.length ? txt1 : hP(`Már csak egyetlen ellenállás maradt: Rₑʹ = ${ansQ(t1.r, 'R')}.`));
+  solveTree(t1, { U: Ug });
+  const Re1 = t1.r, Ig1 = t1.I;
+  sol.add('Az új áram (hiba után)',
+    hF('Iᵍʹ = Uᵍ / Rₑʹ'),
+    hF(`Iᵍʹ = ${nb(Ug)} / ${nb(Re1)}`),
+    hA(`Iᵍʹ = ${ansQ(Ig1, 'A')}`));
+
+  // 4. összehasonlítás
+  const dI = Ig1.sub(Ig0);
+  const pct = dI.div(Ig0).mul(100);
+  sol.add('Összehasonlítás',
+    hF(`ΔI = Iᵍʹ − Iᵍ = ${nb(Ig1)} − ${nb(Ig0)} = ${aspan(ansQ(dI, 'A'))}`),
+    hF(`ΔI / Iᵍ = ${nb(dI)} / ${nb(Ig0)} = ${aspan(fmtSig(pct.num(), 4) + NB + '%')}`),
+    hP(dI.sign() < 0 ? `A hiba következtében az eredő ellenállás <strong>nőtt</strong> (${nb(Re0, 4)} Ω → ${nb(Re1, 4)} Ω), a generátor árama <strong>csökkent</strong>.` : `A hiba következtében az eredő ellenállás <strong>csökkent</strong> (${nb(Re0, 4)} Ω → ${nb(Re1, 4)} Ω), a generátor árama <strong>nőtt</strong>.`),
+    f.kind === 'short' ? hWhy('A rövidzár az áramkör ellenállását csökkenti, ezért az áram nő – ez a hibaáram okozza a vezetékek túlmelegedését, és emiatt kell a védelem (olvadóbiztosító, kismegszakító).', 'Gyakorlati megjegyzés:') : hWhy('A szakadás kiveszi a hálózatból az érintett ágat: az eredő ellenállás nő, az áram csökken. A többi, működő ág árama párhuzamos kapcsolásnál nem változik.', 'Gyakorlati megjegyzés:'));
+
+  sol.tree = t0;
+  sol.faultTree = t1;
+  sol.fv = { Re0, Ig0, Re1, Ig1, dI, pct };
+  sol.final = { Ug, Ig: Ig0, Re: Re0, Pg: Ug.mul(Ig0) };
+  return sol;
+}
+
+/* ---------- Ohm törvénye (egyetlen ellenállás) ---------- */
+function solveOhm(pr) {
+  const o = pr.ohm;           // {R, U, I, P, given:[...], find:[...]}
+  const sol = new Sol(pr.tree);
+  const R = o.R, U = o.U, I = o.I, P = o.P;
+  const key = o.given.slice().sort().join('');
+  sol.intro = hP('<strong>Módszer.</strong> Ohm törvénye (U = R · I) és a teljesítmény képlete (P = U · I) kapcsolja össze a négy mennyiséget; a megadott kettőből a másik kettő kiszámítható.');
+  if (key === 'RU') {
+    sol.add('Az áramerősség (Ohm törvénye)', hF('I = U / R'), hF(`I = ${nb(U)} / ${nb(R)}`), hA(`I = ${ansQ(I, 'A')}`));
+    sol.add('A teljesítmény', hF('P = U · I'), hF(`P = ${nb(U)} · ${nb(I)}`), hA(`P = ${ansQ(P, 'P')}`), hWhy(`P = U² / R = ${nb(U)}² / ${nb(R)} = ${nb(U.mul(U).div(R))} W.`, 'Ellenőrzés másképp:'));
+  } else if (key === 'IR') {
+    sol.add('A feszültség (Ohm törvénye)', hF('U = R · I'), hF(`U = ${nb(R)} · ${nb(I)}`), hA(`U = ${ansQ(U, 'V')}`));
+    sol.add('A teljesítmény', hF('P = U · I'), hF(`P = ${nb(U)} · ${nb(I)}`), hA(`P = ${ansQ(P, 'P')}`), hWhy(`P = I² · R = ${nb(I)}² · ${nb(R)} = ${nb(I.mul(I).mul(R))} W.`, 'Ellenőrzés másképp:'));
+  } else if (key === 'IU') {
+    sol.add('Az ellenállás (Ohm törvénye)', hF('R = U / I'), hF(`R = ${nb(U)} / ${nb(I)}`), hA(`R = ${ansQ(R, 'R')}`));
+    sol.add('A teljesítmény', hF('P = U · I'), hF(`P = ${nb(U)} · ${nb(I)}`), hA(`P = ${ansQ(P, 'P')}`));
+  } else if (key === 'PU') {
+    sol.add('Az áramerősség (a teljesítmény képletéből)', hF('P = U · I  ⇒  I = P / U'), hF(`I = ${nb(P)} / ${nb(U)}`), hA(`I = ${ansQ(I, 'A')}`));
+    sol.add('Az ellenállás (Ohm törvénye)', hF('R = U / I'), hF(`R = ${nb(U)} / ${nb(I)}`), hA(`R = ${ansQ(R, 'R')}`), hWhy(`R = U² / P = ${nb(U)}² / ${nb(P)} = ${nb(U.mul(U).div(P))} Ω.`, 'Ellenőrzés másképp:'));
+  } else { // PR
+    sol.add('A feszültség (a teljesítmény és Ohm törvényéből)', hF('P = U² / R  ⇒  U² = P · R  ⇒  U = √(P · R)'), hF(`U = √(${nb(P)} · ${nb(R)}) = √${nb(P.mul(R))}`), hA(`U = ${ansQ(U, 'V')}`));
+    sol.add('Az áramerősség (Ohm törvénye)', hF('I = U / R'), hF(`I = ${nb(U)} / ${nb(R)}`), hA(`I = ${ansQ(I, 'A')}`), hWhy(`P = U · I ⇒ I = P / U = ${nb(P)} / ${nb(U)} = ${nb(P.div(U))} A.`, 'Ellenőrzés másképp:'));
+  }
+  sol.final = { Ug: U, Ig: I, Re: R, Pg: P };
+  sol.tree = pr.tree;
+  sol.noTable = true;
+  return sol;
+}
+
+function finishSol(sol) {
+  const r = sol.root;
+  sol.tree = r;
+  sol.final = { Ug: r.U, Ig: r.I, Re: r.r, Pg: r.U.mul(r.I) };
+  return sol;
+}
+
+function solveProblem(pr) {
+  switch (pr.kind) {
+    case 'forward': case 'igiven': return solveForward(pr);
+    case 'meter': return solveMeter(pr);
+    case 'design': return solveDesign(pr);
+    case 'fault': return solveFault(pr);
+    case 'ohm': return solveOhm(pr);
+    default: throw new Error('Ismeretlen feladattípus: ' + pr.kind);
+  }
+}
+
+/* ---------- összefoglaló táblázat ---------- */
+function resultsTableHtml(root, opts) {
+  opts = opts || {};
+  const leaves = rLeaves(root);
+  const rows = leaves.map(l => `<tr><td>${l.name}</td><td class="num">${fmtQ(l.r, 'R')}</td><td class="num">${fmtQ(l.U, 'V')}</td><td class="num">${fmtQ(l.I, 'A')}</td><td class="num">${fmtQ(l.U.mul(l.I), 'P')}</td></tr>`).join('');
+  const tot = `<tr><td><strong>Generátor / eredő</strong></td><td class="num">${fmtQ(root.r, 'R')}</td><td class="num">${fmtQ(root.U, 'V')}</td><td class="num">${fmtQ(root.I, 'A')}</td><td class="num">${fmtQ(root.U.mul(root.I), 'P')}</td></tr>`;
+  return `<div class="tablewrap"><table class="rt"><thead><tr><th>Elem</th><th class="num">Ellenállás</th><th class="num">Feszültség</th><th class="num">Áramerősség</th><th class="num">Teljesítmény</th></tr></thead><tbody>${rows}</tbody><tfoot>${tot}</tfoot></table></div>`;
+}
+
+/* ============================================================
+   5. Feladatgenerátor (seedelhető, szintekkel és beállításokkal)
+   ============================================================ */
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rInt = (rng, a, b) => a + Math.floor(rng() * (b - a + 1));
+const rPick = (rng, arr) => arr[Math.floor(rng() * arr.length)];
+function rShuffle(rng, arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function rWeighted(rng, obj) {
+  const ents = Object.entries(obj).filter(([, w]) => w > 0);
+  if (!ents.length) return null;
+  let x = rng() * ents.reduce((a, [, w]) => a + w, 0);
+  for (const [k, w] of ents) { x -= w; if (x < 0) return k; }
+  return ents[ents.length - 1][0];
+}
+
+/* ---------- szintek ---------- */
+const LEVELS = {
+  1: {
+    name: 'Alap', desc: 'Ohm törvénye, egyszerű soros és párhuzamos kapcsolások (2–3 ellenállás).',
+    kinds: { ohm: 2, forward: 5 }, n: [2, 3], shapes: { series: 1, parallel: 1 }, depth: 2,
+    series: 'nice', lo: 10, hi: 1000, nice: true, asks: 'all', pChoice: 0.2, uMin: 5, uMax: 60
+  },
+  2: {
+    name: 'Könnyű', desc: 'Három ellenállás: soros–párhuzamos és párhuzamos–soros vegyes kapcsolások.',
+    kinds: { forward: 6, igiven: 2 }, n: [3, 3], shapes: { mixed: 1 }, depth: 2,
+    series: 'nice', lo: 10, hi: 1000, nice: true, asks: 'all', pChoice: 0.3, uMin: 5, uMax: 120
+  },
+  3: {
+    name: 'Közepes', desc: 'Négy ellenállás, műszeres (visszafelé számolós) és hiányzó-ellenállás feladatok.',
+    kinds: { forward: 4, igiven: 1, meter: 3, design: 2 }, n: [4, 4], shapes: { mixed: 1 }, depth: 2,
+    series: 'nice', lo: 10, hi: 2000, nice: true, asks: 'all', pChoice: 0.3, uMin: 5, uMax: 240
+  },
+  4: {
+    name: 'Haladó', desc: 'Öt–hat ellenállás, beágyazott csoportok, hibakeresés (szakadás, rövidzár).',
+    kinds: { forward: 3, igiven: 1, meter: 3, design: 2, fault: 2 }, n: [5, 6], shapes: { mixed: 1 }, depth: 3,
+    series: 'nice', lo: 10, hi: 5000, nice: true, asks: 'some', pChoice: 0.3, uMin: 5, uMax: 400
+  },
+  5: {
+    name: 'Mester', desc: 'Hat–nyolc ellenállás, E12-es szabványértékek, valósághű (nem kerek) számok.',
+    kinds: { forward: 2, igiven: 1, meter: 2, design: 2, fault: 2 }, n: [6, 8], shapes: { mixed: 1 }, depth: 4,
+    series: 'E12', lo: 100, hi: 10000, nice: false, asks: 'some', pChoice: 0.3, uMin: 5, uMax: 400
+  }
+};
+
+function defaultOpts(level) {
+  const L = LEVELS[level] || LEVELS[2];
+  return {
+    level: level || 2,
+    kinds: Object.assign({ ohm: 0, forward: 0, igiven: 0, meter: 0, design: 0, fault: 0 }, L.kinds),
+    nMin: L.n[0], nMax: L.n[1],
+    shapes: Object.assign({ series: 0, parallel: 0, mixed: 0 }, L.shapes),
+    depth: L.depth, series: L.series, lo: L.lo, hi: L.hi, nice: L.nice,
+    ug: 'auto', uMin: L.uMin, uMax: L.uMax,
+    asks: L.asks, pChoice: L.pChoice
+  };
+}
+
+/* ---------- értéksorok ---------- */
+const MANT = {
+  nice: ['1', '1.2', '1.25', '1.5', '1.6', '1.8', '2', '2.4', '2.5', '3', '3.6', '4', '4.5', '4.8', '5', '6', '7.2', '7.5', '8', '9'],
+  E6: ['1', '1.5', '2.2', '3.3', '4.7', '6.8'],
+  E12: ['1', '1.2', '1.5', '1.8', '2.2', '2.7', '3.3', '3.9', '4.7', '5.6', '6.8', '8.2']
+};
+function valuePool(series, lo, hi, integersOnly) {
+  const out = [];
+  for (let d = 0; d <= 6; d++) {
+    for (const m of MANT[series] || MANT.nice) {
+      const v = Fr.parse(m).mul(F(10n ** BigInt(d)));
+      const x = v.num();
+      if (x < lo || x > hi) continue;
+      if (integersOnly && v.d !== 1n) continue;
+      out.push(v);
+    }
+  }
+  return out;
+}
+const STD_U = [5, 6, 9, 12, 15, 24, 30, 36, 48, 60, 90, 100, 110, 120, 150, 200, 230, 240, 300, 400];
+
+/** "barátságos" érték: legfeljebb 2 tizedes, a számláló csak 2, 3, 5 prímtényezőt tartalmaz */
+function friendly(r) {
+  if (r.decimals() > 2) return false;
+  const x = r.num();
+  if (x < 1 || x > 1e6) return false;
+  const k = stripTwoFive(r.n);          // legfeljebb egy 3-as tényező marad
+  return k === 1n || k === 3n;
+}
+const combineR = (type, rs) => (type === 'S' ? frSum(rs) : frSum(rs.map(r => r.inv())).inv());
+
+function roundSigFr(f, sig) {
+  const x = f.num();
+  if (x === 0) return FR0;
+  return Fr.of(String(Number(x.toPrecision(sig))));
+}
+
+/* ---------- véletlen fa ---------- */
+const sizeOf = n => (n.t === 'R' ? 1 : n.c.reduce((a, c) => a + sizeOf(c), 0));
+const heightOf = n => (n.t === 'R' ? 0 : 1 + Math.max(...n.c.map(heightOf)));
+
+function randTree(rng, n, type) {
+  if (n === 1) return Rleaf(0);
+  const k = n >= 3 && rng() < 0.28 ? 3 : 2;
+  let sizes;
+  if (k === 2) { const a = rInt(rng, 1, n - 1); sizes = [a, n - a]; }
+  else { const a = rInt(rng, 1, n - 2); const b = rInt(rng, 1, n - a - 1); sizes = [a, b, n - a - b]; }
+  const other = type === 'S' ? 'P' : 'S';
+  let kids = sizes.map(s => randTree(rng, s, other));
+  if (type === 'P') kids = kids.map(c => [c, rng()]).sort((a, b) => sizeOf(a[0]) - sizeOf(b[0]) || a[1] - b[1]).map(x => x[0]);
+  return type === 'S' ? Sn(kids) : Pn(kids);
+}
+
+function numberLeaves(root) {
+  let i = 0;
+  walk(root, n => { if (n.t === 'R') n.i = ++i; });
+  return root;
+}
+
+function buildNetwork(opts, rng, nMinReq) {
+  const nLo = Math.max(opts.nMin, nMinReq);
+  const nHi = Math.max(opts.nMax, nLo);
+  const n = rInt(rng, nLo, nHi);
+  if (n === 1) return numberLeaves(Rleaf(0));
+  let shape = rWeighted(rng, opts.shapes) || 'mixed';
+  if (n === 2 && shape === 'mixed') shape = rng() < 0.5 ? 'series' : 'parallel';
+  const leaves = () => Array.from({ length: n }, () => Rleaf(0));
+  let tree = null;
+  if (shape === 'series') tree = Sn(leaves());
+  else if (shape === 'parallel') tree = Pn(leaves());
+  else {
+    const maxH = Math.max(2, opts.depth);
+    for (let t = 0; t < 100 && !tree; t++) {
+      const cand = norm(randTree(rng, n, rng() < 0.5 ? 'S' : 'P'));
+      const h = heightOf(cand);
+      if (h >= 2 && h <= maxH) tree = cand;
+    }
+    if (!tree) {
+      // tartalék: egy elem sorosan egy párhuzamos csoporttal
+      tree = Sn([Rleaf(0), Pn(Array.from({ length: n - 1 }, () => Rleaf(0)))]);
+    }
+  }
+  return numberLeaves(tree);
+}
+
+/* ---------- értékek hozzárendelése ---------- */
+function assignValues(tree, opts, rng, nice) {
+  const series = nice ? 'nice' : opts.series;
+  let pool = valuePool(series, opts.lo, opts.hi, nice);
+  if (nice) pool = pool.filter(v => { const k = stripTwoFive(v.n); return k === 1n || k === 3n; });
+  if (pool.length < 4) return false;
+  if (!nice) {
+    rLeaves(tree).forEach(l => { l.v = rPick(rng, pool); });
+    return true;
+  }
+  let ok = true;
+  (function rec(n) {
+    if (n.t === 'R') { n.v = rPick(rng, pool); return n.v; }
+    const leaves = n.c.filter(c => c.t === 'R');
+    const comps = n.c.filter(c => c.t !== 'R');
+    const known = comps.map(rec);
+    leaves.slice(0, -1).forEach(l => { l.v = rPick(rng, pool); known.push(l.v); });
+    if (leaves.length) {
+      const last = leaves[leaves.length - 1];
+      const cand = rShuffle(rng, pool).find(v => friendly(combineR(n.t, known.concat([v]))));
+      if (cand) last.v = cand; else { last.v = rPick(rng, pool); ok = false; }
+      known.push(last.v);
+    }
+    const res = combineR(n.t, known);
+    if (!friendly(res)) ok = false;
+    return res;
+  })(tree);
+  return ok;
+}
+
+function allFriendly(root) {
+  return allNodes(root).every(n => friendly(n.r));
+}
+
+/* ---------- a generátorfeszültség megválasztása ---------- */
+function ugLimits(opts) {
+  return { uMin: opts.uMin || 5, uMax: opts.uMax || 400, uDec: 2, iDec: 4, iMax: 3, iMin: 0.0005, pMax: 300 };
+}
+
+function quantsOf(root, mask) {
+  solveTree(root, { U: FR1 });
+  const q = [];
+  if (mask === 'root') { q.push({ f: root.I, k: 'I' }); return q; }
+  allNodes(root).forEach(n => { q.push({ f: n.U, k: 'U' }); q.push({ f: n.I, k: 'I' }); });
+  return q;
+}
+
+/** roots: [{root, I1}] – a gyökér áramához tartozó 1 V-os érték(ek), korlátellenőrzéshez */
+function pickUg(rng, quants, opts, nice, trees) {
+  const lim = ugLimits(opts);
+  if (opts.ug !== 'auto' && typeof opts.ug === 'number') {
+    const u = opts.ug;
+    const U = Fr.of(u);
+    if (nice && !quants.every(q => q.f.mul(U).decimals() <= (q.k === 'U' ? lim.uDec : lim.iDec))) return null;
+    return U;
+  }
+  let cands;
+  if (nice) {
+    let D = 1n;
+    for (const q of quants) D = bLcm(D, stripTwoFive(q.f.d));
+    if (D > 2000n) return null;
+    const step = Number(D);
+    cands = [];
+    for (let u = step; u <= lim.uMax; u += step) if (u >= lim.uMin) cands.push(u);
+  } else {
+    cands = STD_U.filter(u => u >= lim.uMin && u <= lim.uMax);
+  }
+  const good = cands.filter(u => {
+    const U = Fr.of(u);
+    if (nice) {
+      for (const q of quants) {
+        if (q.f.mul(U).decimals() > (q.k === 'U' ? lim.uDec : lim.iDec)) return false;
+      }
+    }
+    for (const t of trees) {
+      const I = t.I.num() * u;            // t.I az 1 V-hoz tartozó áram
+      if (I > lim.iMax || I < lim.iMin) return false;
+      // az egyes ellenállások teljesítménye
+      for (const l of rLeaves(t)) if (l.U.num() * l.I.num() * u * u > lim.pMax) return false;
+    }
+    return true;
+  });
+  if (!good.length) return null;
+  const w = good.map(u => (STD_U.includes(u) ? 25 : 1));
+  let x = rng() * w.reduce((a, b) => a + b, 0), i = 0;
+  while (i < good.length - 1 && (x -= w[i]) >= 0) i++;
+  return Fr.of(good[i]);
+}
+
+/* ---------- feladatobjektum ---------- */
+function newProblem(kind, tree, extra) {
+  return Object.assign({ kind, tree, given: {}, asks: [], level: 2, topic: '' }, extra || {});
+}
+
+const ASK_UNIT_KIND = { U: 'V', I: 'A', P: 'P', R: 'R' };
+function mkAsk(key, label, kind, f, extra) {
+  const fr = Fr.of(f);
+  return Object.assign({ key, label, kind, expFr: fr, exp: fr.num(), unit: kind === '%' ? '%' : bestUnit(kind, fr) }, extra || {});
+}
+
+/** egy kérdés a kulcsa alapján (a megoldott fa alapján) */
+function askByKey(pr, key) {
+  const sol = pr.sol;
+  const root = sol.tree;
+  let m;
+  switch (key) {
+    case 'Re': return mkAsk(key, 'Rₑ', 'R', root.r);
+    case 'Ig': return mkAsk(key, 'Iᵍ', 'A', root.I);
+    case 'Ug': return mkAsk(key, 'Uᵍ', 'V', root.U);
+    case 'Pg': return mkAsk(key, 'Pᵍ', 'P', root.U.mul(root.I));
+    case 'Rx': return mkAsk(key, 'Rₓ', 'R', sol.rx);
+    case 'Ig0': return mkAsk(key, 'Iᵍ (a hiba előtt)', 'A', sol.fv.Ig0);
+    case 'Re1': return mkAsk(key, 'Rₑʹ (a hiba után)', 'R', sol.fv.Re1);
+    case 'Ig1': return mkAsk(key, 'Iᵍʹ (a hiba után)', 'A', sol.fv.Ig1);
+    case 'dpct': return mkAsk(key, 'Az áram változása (előjeles)', '%', sol.fv.pct);
+    case 'Iohm': return mkAsk(key, 'I', 'A', pr.ohm.I);
+    case 'Uohm': return mkAsk(key, 'U', 'V', pr.ohm.U);
+    case 'Rohm': return mkAsk(key, 'R', 'R', pr.ohm.R);
+    case 'Pohm': return mkAsk(key, 'P', 'P', pr.ohm.P);
+  }
+  if ((m = /^([UIP])(\d)$/.exec(key))) {
+    const l = leafBy(root, parseInt(m[2], 10));
+    if (!l) throw new Error('Nincs ilyen ellenállás: ' + key);
+    const sub = subs(m[2]);
+    if (m[1] === 'U') return mkAsk(key, 'U' + sub, 'V', l.U);
+    if (m[1] === 'I') return mkAsk(key, 'I' + sub, 'A', l.I);
+    return mkAsk(key, 'P' + sub, 'P', l.U.mul(l.I));
+  }
+  throw new Error('Ismeretlen kérdéskulcs: ' + key);
+}
+
+function choiceAsk(pr, rng, which) {
+  const leaves = rLeaves(pr.sol.tree);
+  if (leaves.length < 3) return null;
+  const q = which || rPick(rng, ['U', 'I', 'P']);
+  const val = l => (q === 'U' ? l.U : q === 'I' ? l.I : l.U.mul(l.I));
+  const sorted = leaves.slice().sort((a, b) => val(b).cmp(val(a)));
+  if (val(sorted[0]).eq(val(sorted[1]))) return null;
+  const label = q === 'U' ? 'Melyik ellenálláson esik a legnagyobb feszültség?'
+    : q === 'I' ? 'Melyik ellenálláson folyik a legnagyobb áram?' : 'Melyik ellenállás teljesítménye a legnagyobb?';
+  return { key: 'max' + q, label, kind: 'choice', options: leaves.map(l => l.name), exp: sorted[0].name, expFr: null, unit: '' };
+}
+
+/** a kérdéskészlet előállítása a feladattípus és az 'asks' mód alapján */
+function makeAskKeys(pr, mode, rng) {
+  const root = pr.sol.tree;
+  const leaves = rLeaves(root);
+  const idx = leaves.map(l => l.i);
+  const kind = pr.kind;
+  if (kind === 'ohm') return pr.ohm.find.map(k => k + 'ohm');
+  if (kind === 'design') return ['Rx', pr.design.target.Re ? 'Ig' : 'Re'];
+  if (kind === 'fault') return ['Ig0', 'Re1', 'Ig1', 'dpct'];
+  const head = kind === 'forward' ? ['Re', 'Ig'] : kind === 'igiven' ? ['Re', 'Ug'] : ['Ug'];
+  const skip = new Set();
+  if (kind === 'meter') {
+    const m = pr.given.meter;
+    skip.add((m.type === 'V' ? 'U' : 'I') + m.leaf);
+  }
+  const per = [];
+  idx.forEach(i => { ['U', 'I'].forEach(q => { if (!skip.has(q + i)) per.push(q + i); }); });
+  if (mode === 'basic') return kind === 'meter' ? ['Ug', 'Ig', 'Re'] : head;
+  if (mode === 'power') return idx.map(i => 'P' + i).concat(['Pg']);
+  if (mode === 'some') {
+    const pool = [];
+    idx.forEach(i => { ['U', 'I', 'P'].forEach(q => { if (!skip.has(q + i)) pool.push(q + i); }); });
+    const k = Math.min(pool.length, leaves.length >= 5 ? 4 : 3);
+    const pick = rShuffle(rng, pool).slice(0, k);
+    pick.sort((a, b) => parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10) || a.localeCompare(b));
+    return head.concat(pick);
+  }
+  return head.concat(per);       // 'all'
+}
+
+/* ---------- szövegek ---------- */
+function shapeName(root) {
+  if (root.t === 'R') return 'Egyetlen ellenállás';
+  const flat = root.c.every(c => c.t === 'R');
+  if (flat) return root.t === 'S' ? 'Soros kapcsolás' : 'Párhuzamos kapcsolás';
+  return rLeaves(root).length <= 3 ? (root.t === 'S' ? 'Soros–párhuzamos kapcsolás' : 'Párhuzamos–soros kapcsolás') : 'Vegyes kapcsolás';
+}
+
+function makeTitleAndTopic(pr) {
+  const n = rLeaves(pr.tree).length;
+  switch (pr.kind) {
+    case 'ohm': return ['Ohm törvénye', 'ohm'];
+    case 'meter': return [`Műszeres feladat – ${shapeName(pr.tree).toLowerCase()}, ${n} ellenállás`, 'meter'];
+    case 'design': return [`Hiányzó ellenállás – ${n} ellenállás`, 'design'];
+    case 'fault': return [`Hibakeresés – ${shapeName(pr.tree).toLowerCase()}, ${n} ellenállás`, 'fault'];
+    case 'igiven': return [`Az áram ismert – ${shapeName(pr.tree).toLowerCase()}, ${n} ellenállás`, 'igiven'];
+    default: {
+      const flat = pr.tree.t !== 'R' && pr.tree.c.every(c => c.t === 'R');
+      const topic = pr.tree.t === 'R' ? 'ohm' : flat ? (pr.tree.t === 'S' ? 'soros' : 'parhuzamos') : 'vegyes';
+      return [`${shapeName(pr.tree)} – ${n} ellenállás`, topic];
+    }
+  }
+}
+
+function makeStatement(pr) {
+  const root = pr.sol.tree;
+  const asksTxt = {
+    all: 'Számítsd ki az eredő ellenállást, a generátor áramát, valamint minden ellenállás feszültségét és áramerősségét!',
+    some: 'Számítsd ki az alább kért mennyiségeket!',
+    power: 'Számítsd ki az ellenállásokon fellépő teljesítményeket és a generátor teljesítményét!',
+    basic: 'Számítsd ki az alább kért mennyiségeket!'
+  };
+  const mode = pr.askMode || 'all';
+  switch (pr.kind) {
+    case 'forward':
+      return `Az ábrán látható ellenállás-hálózatra Uᵍ = ${fmtQ(pr.given.Ug, 'V')} feszültségű generátort kapcsolunk. ${asksTxt[mode] || asksTxt.all}`;
+    case 'igiven':
+      return `Az ábrán látható ellenállás-hálózatot olyan generátor táplálja, amelynek árama Iᵍ = ${fmtQ(pr.given.Ig, 'A')}. Számítsd ki a generátor feszültségét (Uᵍ) és az alább kért további mennyiségeket!`;
+    case 'meter': {
+      const m = pr.given.meter;
+      const nm = 'R' + subs(m.leaf);
+      return m.type === 'V'
+        ? `Az ábrán a V jelű (ideális) voltmérő az ${nm} ellenálláson ${fmtQ(m.value, 'V')} feszültséget mutat. Számítsd ki a generátor feszültségét (Uᵍ) és az alább kért mennyiségeket!`
+        : `Az ábrán az A jelű (ideális) ampermérő az ${nm} ellenálláson átfolyó áramot méri: ${fmtQ(m.value, 'A')}. Számítsd ki a generátor feszültségét (Uᵍ) és az alább kért mennyiségeket!`;
+    }
+    case 'design': {
+      const d = pr.design;
+      return d.target.Re
+        ? `Mekkora legyen az Rₓ ellenállás értéke, hogy a kapcsolás eredő ellenállása Rₑ = ${fmtQ(d.target.Re, 'R')} legyen?`
+        : `Mekkora legyen az Rₓ ellenállás értéke, hogy az Uᵍ = ${fmtQ(d.Ug, 'V')} feszültségű generátor árama Iᵍ = ${fmtQ(d.target.Ig, 'A')} legyen?`;
+    }
+    case 'fault': {
+      const f = pr.fault;
+      const nm = 'R' + subs(f.leaf);
+      return `A kapcsolás eredetileg hibátlan, a generátor feszültsége Uᵍ = ${fmtQ(f.Ug, 'V')}. Ezután az ${nm} ellenállás ${f.kind === 'open' ? '<strong>megszakad</strong> (szakadás)' : '<strong>rövidre záródik</strong> (rövidzár)'}. Számítsd ki a generátor áramát a hiba előtt és után, az eredő ellenállást a hiba után, és azt, hogy hány százalékkal változott meg az áram! (A csökkenést negatív előjellel add meg.)`;
+    }
+    case 'ohm': return pr.ohm.text;
+  }
+  return '';
+}
+
+function makeData(pr) {
+  const items = [];
+  const root = pr.tree;
+  if (pr.kind === 'ohm') {
+    const o = pr.ohm;
+    o.given.forEach(k => {
+      items.push(k === 'R' ? ['R', fmtQ(o.R, 'R')] : k === 'U' ? ['U', fmtQ(o.U, 'V')] : k === 'I' ? ['I', fmtQ(o.I, 'A')] : ['P', fmtQ(o.P, 'P')]);
+    });
+    return items;
+  }
+  rLeaves(root).forEach(l => items.push([l.name, l.x ? '?' : fmtQ(l.v, 'R')]));
+  if (pr.kind === 'forward') items.unshift(['Uᵍ', fmtQ(pr.given.Ug, 'V')]);
+  if (pr.kind === 'igiven') items.unshift(['Iᵍ', fmtQ(pr.given.Ig, 'A')]);
+  if (pr.kind === 'meter') {
+    const m = pr.given.meter;
+    items.unshift([m.type === 'V' ? `V (az R${subs(m.leaf)}-en)` : `A (az R${subs(m.leaf)} ágában)`, fmtQ(m.value, m.type === 'V' ? 'V' : 'A')]);
+  }
+  if (pr.kind === 'design') {
+    items.unshift(['Uᵍ', fmtQ(pr.design.Ug, 'V')]);
+    items.push(pr.design.target.Re ? ['Cél: Rₑ', fmtQ(pr.design.target.Re, 'R')] : ['Cél: Iᵍ', fmtQ(pr.design.target.Ig, 'A')]);
+  }
+  if (pr.kind === 'fault') items.unshift(['Uᵍ', fmtQ(pr.fault.Ug, 'V')]);
+  return items;
+}
+
+/** a feladat összes származtatott adata (megoldás, kérdések, szöveg) */
+function finalizeProblem(pr, opts, rng, askKeys) {
+  pr.sol = solveProblem(pr);
+  const mode = (opts && opts.asks) || 'all';
+  pr.askMode = mode;
+  const keys = askKeys || makeAskKeys(pr, mode, rng || mulberry32(1));
+  pr.asks = keys.map(k => askByKey(pr, k));
+  if (opts && rng && ['forward', 'igiven', 'meter'].includes(pr.kind) && !askKeys && rng() < (opts.pChoice || 0)) {
+    const c = choiceAsk(pr, rng);
+    if (c) pr.asks.push(c);
+  }
+  const tt = makeTitleAndTopic(pr);
+  if (!pr.title) pr.title = tt[0];
+  if (!pr.topic) pr.topic = tt[1];
+  if (!pr.statement) pr.statement = makeStatement(pr);
+  pr.data = makeData(pr);
+  return pr;
+}
+
+/* ---------- feladattípusonkénti építők ---------- */
+function tryForwardLike(kind, opts, rng, nice) {
+  const tree = buildNetwork(opts, rng, 2);
+  if (!assignValues(tree, opts, rng, nice)) return null;
+  prep(tree);
+  const quants = quantsOf(tree, 'all');
+  const Ug = pickUg(rng, quants, opts, nice, [tree]);
+  if (!Ug) return null;
+  const pr = newProblem(kind, tree);
+  if (kind === 'forward') {
+    pr.given = { Ug };
+  } else {
+    solveTree(tree, { U: Ug });
+    pr.given = { Ig: nice ? tree.I : roundSigFr(tree.I, 3) };
+  }
+  return pr;
+}
+
+function tryMeter(opts, rng, nice) {
+  const tree = buildNetwork(opts, rng, 2);
+  if (!assignValues(tree, opts, rng, nice)) return null;
+  prep(tree);
+  const quants = quantsOf(tree, 'all');
+  const Ug = pickUg(rng, quants, opts, nice, [tree]);
+  if (!Ug) return null;
+  solveTree(tree, { U: Ug });
+  let pick = null;
+  for (const l of rShuffle(rng, rLeaves(tree))) {
+    const types = rng() < 0.5 ? ['V', 'A'] : ['A', 'V'];
+    for (const t of types) {
+      if (t === 'V' ? l.U.lt(tree.U) : l.I.lt(tree.I)) { pick = { l, t }; break; }
+    }
+    if (pick) break;
+  }
+  if (!pick) return null;
+  let value = pick.t === 'V' ? pick.l.U : pick.l.I;
+  if (!nice) value = roundSigFr(value, 3);
+  const pr = newProblem('meter', tree);
+  pr.given = { meter: { type: pick.t, leaf: pick.l.i, value } };
+  return pr;
+}
+
+/** az x-edik ellenállás értéke, hogy a gyökér eredője 'target' legyen (null, ha nem lehetséges) */
+function designValue(root, xIdx, target) {
+  const path = pathTo(root, xIdx);
+  let need = target;
+  for (let j = 0; j < path.length - 1; j++) {
+    const n = path[j], child = path[j + 1];
+    const sibs = n.c.filter(c => c !== child);
+    if (n.t === 'S') {
+      need = need.sub(frSum(sibs.map(s => s.r)));
+    } else {
+      const g = need.inv().sub(frSum(sibs.map(s => s.r.inv())));
+      if (g.sign() <= 0) return null;
+      need = g.inv();
+    }
+    if (need.sign() <= 0) return null;
+  }
+  return need;
+}
+
+function tryDesign(opts, rng, nice) {
+  const tree = buildNetwork(opts, rng, 2);
+  if (!assignValues(tree, opts, rng, nice)) return null;
+  prep(tree);
+  const quants = quantsOf(tree, 'root');
+  const Ug = pickUg(rng, quants, opts, nice, [tree]);
+  if (!Ug) return null;
+  solveTree(tree, { U: Ug });
+  const x = rPick(rng, rLeaves(tree));
+  const useRe = rng() < 0.5;
+  let target = useRe ? { Re: tree.r } : { Ig: tree.I };
+  if (!nice) target = useRe ? { Re: roundSigFr(tree.r, 4) } : { Ig: roundSigFr(tree.I, 3) };
+  const Rt = target.Re || Ug.div(target.Ig);
+  x.x = true;
+  prep(tree);
+  const val = designValue(tree, x.i, Rt);
+  if (!val) return null;
+  if (nice && !val.eq(x.v)) return null;
+  const pr = newProblem('design', tree);
+  pr.design = { x: x.i, target, Ug };
+  pr.given = { Ug };
+  return pr;
+}
+
+function tryFault(opts, rng, nice) {
+  const tree = buildNetwork(opts, rng, 2);
+  if (!assignValues(tree, opts, rng, nice)) return null;
+  prep(tree);
+  let chosen = null;
+  for (const l of rShuffle(rng, rLeaves(tree))) {
+    for (const kind of rng() < 0.6 ? ['open', 'short'] : ['short', 'open']) {
+      const t1 = applyFault(tree, l.i, kind);
+      if (!t1) continue;
+      if (nice && !allFriendly(t1)) continue;
+      chosen = { l, kind, t1 };
+      break;
+    }
+    if (chosen) break;
+  }
+  if (!chosen) return null;
+  const q0 = quantsOf(tree, 'root');
+  const q1 = quantsOf(chosen.t1, 'root');
+  const Ug = pickUg(rng, q0.concat(q1), opts, nice, [tree, chosen.t1]);
+  if (!Ug) return null;
+  const pr = newProblem('fault', tree);
+  pr.fault = { leaf: chosen.l.i, kind: chosen.kind, Ug };
+  pr.given = { Ug };
+  return pr;
+}
+
+const OHM_CTX = [
+  { nom: 'fűtőszál', sub: 'fűtőszálra', sup: 'fűtőszálon' },
+  { nom: 'izzó', sub: 'izzóra', sup: 'izzón' },
+  { nom: 'fogyasztó', sub: 'fogyasztóra', sup: 'fogyasztón' },
+  { nom: 'ellenállás', sub: 'ellenállásra', sup: 'ellenálláson' }
+];
+function ohmText(variant, R, U, I, P, ctx) {
+  const Rq = fmtQ(R, 'R'), Uq = fmtQ(U, 'V'), Iq = fmtQ(I, 'A'), Pq = fmtQ(P, 'P');
+  const key = variant.slice().sort().join('');
+  if (key === 'RU') return `Egy ${Rq}-os ${ctx.sub} ${Uq} feszültséget kapcsolunk. Mekkora áram folyik rajta, és mekkora a teljesítménye?`;
+  if (key === 'IR') return `Egy ${Rq}-os ${ctx.sup} ${Iq} áram folyik át. Mekkora feszültség esik rajta, és mekkora a teljesítménye?`;
+  if (key === 'IU') return `Egy ${ctx.nom} kapcsain ${Uq} feszültséget mérünk, a rajta átfolyó áram ${Iq}. Mekkora az ellenállása, és mekkora a teljesítménye?`;
+  if (key === 'PU') return `Egy ${ctx.nom} teljesítménye ${Pq}, ${Uq} feszültségről üzemel. Mekkora a felvett áram, és mekkora az ellenállása?`;
+  return `Egy ${Rq}-os ${ctx.nom} teljesítménye ${Pq}. Mekkora feszültség esik rajta, és mekkora áram folyik át rajta?`;
+}
+function tryOhm(opts, rng, nice) {
+  const pool = valuePool('nice', Math.max(opts.lo, 10), Math.min(opts.hi, 5000), true);
+  if (!pool.length) return null;
+  const R = rPick(rng, pool);
+  let us = [5, 6, 9, 12, 24, 48, 110, 230, 400].filter(u => u >= (opts.uMin || 5) && u <= Math.max(opts.uMax || 400, 24));
+  if (!us.length) us = [12, 24];
+  const U = Fr.of(rPick(rng, us));
+  const I = U.div(R), P = U.mul(I);
+  if (nice && (I.decimals() > 3 || P.decimals() > 3 || I.num() > 6 || I.num() < 0.001 || P.num() > 3000)) return null;
+  const variant = rPick(rng, [['R', 'U'], ['R', 'I'], ['U', 'I'], ['U', 'P'], ['R', 'P']]);
+  const ctx = rPick(rng, OHM_CTX);
+  const leaf = Rleaf(1, R);
+  prep(leaf);
+  const pr = newProblem('ohm', leaf);
+  pr.ohm = { R, U, I, P, given: variant, find: ['R', 'U', 'I', 'P'].filter(k => !variant.includes(k)), text: ohmText(variant, R, U, I, P, ctx) };
+  return pr;
+}
+
+/* ---------- a fő belépési pont ---------- */
+function genProblem(opts, seed) {
+  const rng = mulberry32(seed);
+  for (let attempt = 0; attempt < 700; attempt++) {
+    const nice = !!opts.nice && attempt < 520;
+    const kind = rWeighted(rng, opts.kinds) || 'forward';
+    let pr = null;
+    switch (kind) {
+      case 'ohm': pr = tryOhm(opts, rng, nice); break;
+      case 'forward': case 'igiven': pr = tryForwardLike(kind, opts, rng, nice); break;
+      case 'meter': pr = tryMeter(opts, rng, nice); break;
+      case 'design': pr = tryDesign(opts, rng, nice); break;
+      case 'fault': pr = tryFault(opts, rng, nice); break;
+    }
+    if (pr) {
+      pr.level = opts.level;
+      pr.seed = seed;
+      pr.id = 'G-' + seed;
+      pr.nice = nice;
+      return finalizeProblem(pr, opts, rng);
+    }
+  }
+  throw new Error('A feladat generálása nem sikerült a megadott beállításokkal – próbálj lazább beállításokat.');
+}
+
+/* ---------- feladat összeállítása leírásból (feladatbank, saját kapcsolás) ---------- */
+function bigSqrt(n) {
+  if (n < 0n) return null;
+  if (n < 2n) return n;
+  let x = BigInt(Math.floor(Math.sqrt(Number(n))));
+  while (x * x > n) x--;
+  while ((x + 1n) * (x + 1n) <= n) x++;
+  return x;
+}
+function fracSqrt(f) {
+  const a = bigSqrt(f.n), b = bigSqrt(f.d);
+  return a !== null && a * a === f.n && b * b === f.d ? new Fr(a, b) : null;
+}
+
+function ohmFromSpec(spec) {
+  const o = spec.ohm;
+  const g = k => (o[k] !== undefined ? Fr.of(o[k]) : null);
+  let R = g('R'), U = g('U'), I = g('I'), P = g('P');
+  const given = o.given;
+  const has = k => given.includes(k);
+  if (has('R') && has('U')) { I = U.div(R); P = U.mul(I); }
+  else if (has('R') && has('I')) { U = R.mul(I); P = U.mul(I); }
+  else if (has('U') && has('I')) { R = U.div(I); P = U.mul(I); }
+  else if (has('U') && has('P')) { I = P.div(U); R = U.div(I); }
+  else if (has('R') && has('P')) { U = fracSqrt(P.mul(R)); if (!U) throw new Error('Az U nem pontos négyzetgyök'); I = U.div(R); }
+  else throw new Error('Ohm-feladat: a megadott mennyiségek nem elegendők');
+  const leaf = Rleaf(1, R);
+  prep(leaf);
+  const pr = newProblem('ohm', leaf);
+  pr.ohm = { R, U, I, P, given, find: ['R', 'U', 'I', 'P'].filter(k => !given.includes(k)) };
+  return pr;
+}
+
+function problemFromSpec(spec) {
+  let cu = null;
+  if (spec.kind === 'custom') cu = spec.custom();
+  let pr;
+  if (spec.kind === 'ohm') {
+    pr = ohmFromSpec(spec);
+  } else {
+    const expr = cu && cu.expr ? cu.expr : spec.expr;
+    const vals = cu && cu.R ? cu.R : spec.R;
+    const tree = parseExpr(expr);
+    rLeaves(tree).forEach(l => {
+      const v = Array.isArray(vals) ? vals[l.i - 1] : vals[l.i];
+      if (v === undefined || v === null) throw new Error('Hiányzó ellenállásérték: R' + l.i);
+      l.v = Fr.of(v);
+    });
+    const xIdx = spec.design ? spec.design.x : (cu && cu.x);
+    if (xIdx) leafBy(tree, xIdx).x = true;
+    const labels = (cu && cu.labels) || spec.labels;
+    if (labels) rLeaves(tree).forEach(l => { if (labels[l.i]) l.label = labels[l.i]; });
+    prep(tree);
+    pr = newProblem(spec.kind === 'custom' ? 'custom' : (spec.kind || 'forward'), tree);
+  }
+  Object.assign(pr, {
+    level: spec.level || 2, topic: spec.topic || '', title: spec.title || '', statement: spec.statement || '',
+    id: spec.id || '', note: spec.note || '', link: spec.link || '', src: spec.src || ''
+  });
+  if (pr.kind === 'ohm') {
+    pr.sol = solveOhm(pr);
+    pr.sol.steps = (spec.pre || []).concat(pr.sol.steps, spec.post || []);
+    pr.askMode = 'custom';
+    const keys = Array.isArray(spec.asks) ? spec.asks : pr.ohm.find.map(k => k + 'ohm');
+    pr.asks = keys.map(k => askByKey(pr, k));
+    if (!pr.statement) pr.statement = pr.ohm.text || '';
+    pr.data = makeData(pr);
+    if (!pr.title) pr.title = 'Ohm törvénye';
+    if (!pr.topic) pr.topic = 'ohm';
+    return pr;
+  }
+  if (pr.kind === 'custom') {
+    const t = pr.tree;
+    if (cu.Ug !== undefined) { solveTree(t, { U: Fr.of(cu.Ug) }); }
+    pr.ugText = cu.ugText || '';
+    pr.igText = cu.igText || '';
+    pr.sol = { root: t, tree: t, intro: cu.intro || '', steps: cu.steps, figs: cu.figs || [], noTable: !cu.table,
+      final: cu.Ug !== undefined ? { Ug: t.U, Ig: t.I, Re: t.r, Pg: t.U.mul(t.I) } : null };
+    pr.askMode = 'custom';
+    pr.asks = cu.asks.map(a => mkAsk(a.key, a.label, a.kind, a.value, a.extra));
+    if (cu.choices) cu.choices.forEach(c => pr.asks.push(c));
+    pr.data = cu.data || makeData(Object.assign({}, pr, { kind: 'forward', given: { Ug: Fr.of(cu.Ug || 0) } }));
+    if (!pr.title) pr.title = 'Feladat';
+    return pr;
+  }
+  if (spec.Ug !== undefined) pr.given.Ug = Fr.of(spec.Ug);
+  if (spec.Ig !== undefined) pr.given.Ig = Fr.of(spec.Ig);
+  if (spec.meter) pr.given.meter = { type: spec.meter.type, leaf: spec.meter.leaf, value: Fr.of(spec.meter.value), draw: spec.meter.draw !== false };
+  if (spec.design) {
+    pr.design = { x: spec.design.x, target: spec.design.target.Re !== undefined ? { Re: Fr.of(spec.design.target.Re) } : { Ig: Fr.of(spec.design.target.Ig) }, Ug: Fr.of(spec.design.Ug) };
+    pr.given.Ug = pr.design.Ug;
+  }
+  if (spec.fault) { pr.fault = { leaf: spec.fault.leaf, kind: spec.fault.kind, Ug: Fr.of(spec.fault.Ug) }; pr.given.Ug = pr.fault.Ug; }
+  if (pr.kind === 'forward' && pr.given.Ig && !pr.given.Ug) pr.kind = 'igiven';
+  pr.sol = solveProblem(pr);
+  pr.sol.steps = (spec.pre || []).concat(pr.sol.steps, spec.post || []);
+  const mode = Array.isArray(spec.asks) ? 'custom' : (spec.asks || 'all');
+  pr.askMode = mode;
+  const keys = Array.isArray(spec.asks) ? spec.asks : makeAskKeys(pr, mode, mulberry32(7));
+  pr.asks = keys.map(k => askByKey(pr, k));
+  if (spec.extraAsks) spec.extraAsks.forEach(a => pr.asks.push(a.kind === 'choice' ? a : mkAsk(a.key, a.label, a.kind, a.value, a.extra)));
+  if (spec.choice) { const c = choiceAsk(pr, mulberry32(3), spec.choice); if (c) pr.asks.push(c); }
+  const tt = makeTitleAndTopic(pr);
+  if (!pr.title) pr.title = tt[0];
+  if (!pr.topic) pr.topic = tt[1];
+  if (!pr.statement) pr.statement = makeStatement(pr);
+  pr.data = spec.data || makeData(pr);
+  return pr;
+}
+
+/* ============================================================
+   6. SVG-rajzoló: soros–párhuzamos fából kapcsolási rajz
+      (a generátor az alsó ágban, az áram balról jobbra halad)
+   ============================================================ */
+const DG = { GAP: 38, RAIL: 30, BR_GAP: 34, RH: 40, ANN_LH: 18 };
+
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const nn = v => { const r = Math.round(v * 10) / 10; return String(r); };
+
+const resItem = (text, ann) => ({ k: 'res', text, ann: ann || [], w: Math.max(128, Math.round(11.8 * text.length + 34)) });
+const meterItem = (k, text, ann) => ({ k, text: text || '', ann: ann || [], w: 50 });
+const parItem = br => ({ k: 'par', br });
+
+function mItem(it) {
+  if (it.k === 'res') {
+    const ah = it.ann.length ? it.ann.length * DG.ANN_LH + 8 : 0;
+    return [it.w, DG.RH / 2, DG.RH / 2 + ah];
+  }
+  if (it.k === 'volt' || it.k === 'amp') {
+    const lines = (it.text ? 1 : 0) + it.ann.length;
+    const ah = lines ? lines * DG.ANN_LH + 8 : 0;
+    return [it.w, 25, 25 + ah];
+  }
+  return mPar(it).slice(0, 3);
+}
+function mSeries(items) {
+  const ms = items.map(mItem);
+  return [ms.reduce((a, m) => a + m[0], 0) + DG.GAP * (ms.length - 1), Math.max(...ms.map(m => m[1])), Math.max(...ms.map(m => m[2]))];
+}
+function mPar(p) {
+  const ms = p.br.map(mSeries);
+  const maxw = Math.max(...ms.map(m => m[0]));
+  let cur = 0;
+  const axes = [];
+  ms.forEach(m => { axes.push(cur + m[1]); cur += m[1] + m[2] + DG.BR_GAP; });
+  const total = cur - DG.BR_GAP;
+  const n = axes.length;
+  const axis = n % 2 ? axes[(n - 1) / 2] : (axes[n / 2 - 1] + axes[n / 2]) / 2;
+  return [maxw + 2 * DG.RAIL, axis, total - axis, ms, axes, maxw];
+}
+
+class DrawCtx {
+  constructor(arrows) { this.arrows = arrows; this.els = []; this.wires = []; }
+  wire(x1, y1, x2, y2) { this.wires.push(`M${nn(x1)} ${nn(y1)}L${nn(x2)} ${nn(y2)}`); }
+  add(s) { this.els.push(s); }
+  dot(x, y) { this.els.push(`<circle class="node" cx="${nn(x)}" cy="${nn(y)}" r="6"/>`); }
+  arrow(x, y) { this.els.push(`<path class="arrowhead" d="M${nn(x - 7)} ${nn(y - 6.5)}L${nn(x + 6)} ${nn(y)}L${nn(x - 7)} ${nn(y + 6.5)}Z"/>`); }
+}
+
+function dItem(it, x, y, c) {
+  if (it.k === 'res') {
+    c.add(`<rect class="res" x="${nn(x)}" y="${nn(y - DG.RH / 2)}" width="${it.w}" height="${DG.RH}" rx="3"/>`);
+    c.add(`<text class="label" x="${nn(x + it.w / 2)}" y="${nn(y + 6.5)}" text-anchor="middle">${esc(it.text)}</text>`);
+    it.ann.forEach((line, k) => {
+      c.add(`<text class="ann" x="${nn(x + it.w / 2)}" y="${nn(y + DG.RH / 2 + DG.ANN_LH + k * DG.ANN_LH - 2)}" text-anchor="middle">${esc(line)}</text>`);
+    });
+    if (c.arrows) c.arrow(x - 15, y);
+  } else if (it.k === 'volt' || it.k === 'amp') {
+    c.add(`<circle class="res" cx="${nn(x + 25)}" cy="${nn(y)}" r="24"/>`);
+    c.add(`<text class="label" x="${nn(x + 25)}" y="${nn(y + 7)}" text-anchor="middle">${it.k === 'volt' ? 'V' : 'A'}</text>`);
+    const lines = (it.text ? [it.text] : []).concat(it.ann);
+    lines.forEach((line, k) => {
+      c.add(`<text class="ann" x="${nn(x + 25)}" y="${nn(y + 25 + DG.ANN_LH + k * DG.ANN_LH - 2)}" text-anchor="middle">${esc(line)}</text>`);
+    });
+    if (it.k === 'amp' && c.arrows) c.arrow(x - 15, y);
+  } else {
+    dPar(it, x, y, c);
+  }
+}
+function dSeries(items, x, y, c) {
+  let cx = x;
+  items.forEach((it, i) => {
+    const w = mItem(it)[0];
+    dItem(it, cx, y, c);
+    if (i < items.length - 1) c.wire(cx + w, y, cx + w + DG.GAP, y);
+    cx += w + DG.GAP;
+  });
+}
+function dPar(p, x, y, c) {
+  const [w, up, , ms, axes, maxw] = mPar(p);
+  const top = y - up;
+  const ays = axes.map(a => top + a);
+  c.wire(x, ays[0], x, ays[ays.length - 1]);
+  c.wire(x + w, ays[0], x + w, ays[ays.length - 1]);
+  p.br.forEach((br, i) => {
+    const bw = ms[i][0], ay = ays[i];
+    const off = (maxw - bw) / 2;
+    const x1 = x + DG.RAIL + off;
+    c.wire(x, ay, x1, ay);
+    dSeries(br, x1, ay, c);
+    c.wire(x1 + bw, ay, x + w, ay);
+  });
+  c.dot(x, y);
+  c.dot(x + w, y);
+  ays.slice(1, -1).forEach(ay => { if (Math.abs(ay - y) > 0.5) { c.dot(x, ay); c.dot(x + w, ay); } });
+}
+
+/** items: soros elemlista; o: {ugText, igText, arrows, aria} */
+function circuitSvg(items, o) {
+  o = o || {};
+  const c = new DrawCtx(o.arrows !== false);
+  const [w, up, down] = mSeries(items);
+  const xl = 40, x0 = xl + 56, y = 52 + up, xr = x0 + w + 56, yret = y + down + 78;
+  const W = xr + 40, H = yret + 100;
+  c.wire(xl, y, x0, y);
+  dSeries(items, x0, y, c);
+  c.wire(x0 + w, y, xr, y);
+  c.wire(xl, y, xl, yret);
+  c.wire(xr, y, xr, yret);
+  const xs = (xl + xr) / 2;
+  c.wire(xl, yret, xs - 27, yret);
+  c.wire(xs + 27, yret, xr, yret);
+  c.add(`<circle class="source" cx="${nn(xs)}" cy="${nn(yret)}" r="27"/>`);
+  c.add(`<text class="source-mark" x="${nn(xs - 12)}" y="${nn(yret + 8)}" text-anchor="middle">+</text>`);
+  c.add(`<text class="source-mark" x="${nn(xs + 12)}" y="${nn(yret + 8)}" text-anchor="middle">−</text>`);
+  const ya = yret + 50;
+  c.add(`<path d="M${nn(xs - 46)} ${nn(ya)}H${nn(xs + 44)}" stroke="#1769aa" stroke-width="3" stroke-linecap="round"/>`);
+  c.add(`<path d="M${nn(xs + 34)} ${nn(ya - 8)}L${nn(xs + 46)} ${nn(ya)}L${nn(xs + 34)} ${nn(ya + 8)}" fill="none" stroke="#1769aa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`);
+  c.add(`<text class="source-mark" x="${nn(xs)}" y="${nn(ya + 32)}" text-anchor="middle">${esc(o.ugText || 'Uᵍ')}</text>`);
+  const ym = yret - 42;
+  c.add(`<path class="arrowhead" d="M${nn(xl - 8)} ${nn(ym + 7)}L${nn(xl)} ${nn(ym - 9)}L${nn(xl + 8)} ${nn(ym + 7)}Z"/>`);
+  c.add(`<text class="igtext" x="${nn(xl + 16)}" y="${nn(ym + 6)}">${esc(o.igText || 'Iᵍ')}</text>`);
+  const cls = W > 560 ? ' class="wide"' : '';
+  return `<svg${cls} viewBox="0 0 ${nn(W)} ${nn(H)}" style="max-width:${Math.round(W * 1.3)}px;margin:0 auto" role="img" aria-label="${esc(o.aria || 'Kapcsolási rajz')}"><path class="wire" d="${c.wires.join('')}"/>${c.els.join('')}</svg>`;
+}
+
+/* ---------- fa → elemlista ---------- */
+function leafLabel(n, o) {
+  if (n.label) return n.label;
+  if (n.t === 'E') return `${n.name} = ${fmtQ(n.v, 'R')}`;
+  if (n.x && !o.revealX) return `${n.name} = ?`;
+  return `${n.name} = ${fmtQ(n.v, 'R')}`;
+}
+function treeItems(n, o) {
+  if (n.t === 'S') return [].concat(...n.c.map(c => treeItems(c, o)));
+  if (n.t === 'P') return [parItem(n.c.map(c => treeItems(c, o)))];
+  const res = resItem(leafLabel(n, o), o.ann ? (o.ann(n) || []) : []);
+  const m = o.meter;
+  if (m && n.t === 'R' && n.i === m.leaf) {
+    const reading = fmtQ(m.value, m.type === 'V' ? 'V' : 'A');
+    if (m.type === 'V') return [parItem([[res], [meterItem('volt', reading)]])];
+    return [meterItem('amp', reading), res];
+  }
+  return [res];
+}
+function treeSvg(root, o) {
+  o = o || {};
+  return circuitSvg(treeItems(root, o), o);
+}
+
+const annUI = n => (n.t === 'R' && n.U && n.I ? [`U = ${fmtQ(n.U, 'V')}`, `I = ${fmtQ(n.I, 'A')}`] : null);
+
+function ohmSvg(pr, solved) {
+  const o = pr.ohm;
+  const known = k => solved || o.given.includes(k);
+  const rText = known('R') ? `R = ${fmtQ(o.R, 'R')}` : 'R = ?';
+  return circuitSvg([resItem(rText, [known('P') ? `P = ${fmtQ(o.P, 'P')}` : 'P = ?'])], {
+    ugText: known('U') ? `U = ${fmtQ(o.U, 'V')}` : 'U = ?',
+    igText: known('I') ? `I = ${fmtQ(o.I, 'A')}` : 'I = ?',
+    aria: 'Egyetlen ellenállás generátorral'
+  });
+}
+
+/** a feladat rajza: a kiírt adatokkal (solved=false) vagy a megoldott értékekkel (solved=true) */
+function problemSvg(pr, o) {
+  o = o || {};
+  const solved = !!o.solved;
+  if (pr.kind === 'ohm') return ohmSvg(pr, solved);
+  const root = pr.tree;
+  const base = { arrows: o.arrows !== false, revealX: solved, aria: pr.title };
+  const m = pr.given.meter;
+  if (m && m.draw !== false) base.meter = m;
+  let ugText = 'Uᵍ', igText = null;
+  if (pr.kind === 'forward') ugText = `Uᵍ = ${fmtQ(pr.given.Ug, 'V')}`;
+  else if (pr.kind === 'igiven') { ugText = solved ? `Uᵍ = ${fmtQ(root.U, 'V')}` : 'Uᵍ = ?'; igText = `Iᵍ = ${fmtQ(pr.given.Ig, 'A')}`; }
+  else if (pr.kind === 'meter') ugText = solved ? `Uᵍ = ${fmtQ(root.U, 'V')}` : 'Uᵍ = ?';
+  else if (pr.kind === 'design') { ugText = `Uᵍ = ${fmtQ(pr.design.Ug, 'V')}`; if (pr.design.target.Ig) igText = `Iᵍ = ${fmtQ(pr.design.target.Ig, 'A')}`; }
+  else if (pr.kind === 'fault') ugText = `Uᵍ = ${fmtQ(pr.fault.Ug, 'V')}`;
+  else if (pr.kind === 'custom') { ugText = pr.ugText || 'Uᵍ'; igText = pr.igText || null; }
+  if (solved && (pr.kind !== 'custom' || root.U)) { base.ann = annUI; if (pr.kind !== 'igiven') igText = `Iᵍ = ${fmtQ(root.I, 'A')}`; }
+  base.ugText = ugText;
+  base.igText = igText;
+  return treeSvg(root, base);
+}
+
+/** egyszerűsítési lépések ábrái: [{cap, svg}] */
+function stageFigs(root, o) {
+  o = o || {};
+  const figs = [];
+  const common = { arrows: false, ugText: o.ugText || 'Uᵍ' };
+  figs.push({ cap: '<strong>Eredeti kapcsolás</strong>', svg: treeSvg(root, Object.assign({ meter: o.meter }, common)) });
+  stagesOf(root).forEach((s, i, arr) => {
+    const txt = s.reds.map(r => `${r.kids.map(k => k.name).join(r.type === 'S' ? ' + ' : ' ∥ ')} = ${r.name === 'Rₑ' ? 'Rₑ' : r.name} = ${fmtQ(r.r, 'R')}`).join('; ');
+    figs.push({ cap: `<strong>${i + 1}. egyszerűsítés:</strong> ${txt}`, svg: treeSvg(s.tree, common) });
+  });
+  return figs;
+}
+
+/** a lépés-ábrák rácsa, egységes léptékben */
+function figsHtml(figs) {
+  const ws = figs.map(f => parseFloat(/viewBox="0 0 ([\d.]+) /.exec(f.svg)[1]));
+  const wm = Math.max(...ws);
+  let out = '<div class="stages">';
+  figs.forEach((f, i) => {
+    const svg = f.svg.replace(/style="[^"]*"/, `style="width:${(ws[i] / wm * 100).toFixed(1)}%;max-width:${Math.round(ws[i] * 1.3)}px;margin:0 auto"`);
+    out += `<figure class="stage"><div class="diagram-wrap">${svg}</div><figcaption>${f.cap}</figcaption></figure>`;
+  });
+  return out + '</div>';
+}
+
+/* ============================================================
+   7. Feladatbank: válogatott példafeladatok témakörönként
+   ============================================================ */
+const BANK_TOPICS = [
+  ['ohm', 'Ohm törvénye, teljesítmény'],
+  ['soros', 'Soros kapcsolás'],
+  ['parhuzamos', 'Párhuzamos kapcsolás'],
+  ['vegyes', 'Vegyes kapcsolás'],
+  ['osztok', 'Feszültség- és áramosztó'],
+  ['meter', 'Műszeres, visszafelé számolós'],
+  ['design', 'Hiányzó ellenállás, méretezés'],
+  ['teljesitmeny', 'Teljesítmény, gyakorlati feladatok'],
+  ['fault', 'Hibakeresés (szakadás, rövidzár)']
+];
+const TOPIC_NAME = Object.fromEntries(BANK_TOPICS);
+TOPIC_NAME.igiven = 'Az áram adott';
+TOPIC_NAME.meter = 'Műszeres, visszafelé számolós';
+
+const FUZET = n => `00${n}._Feladat_-_${['', '', 'parhuzamos_kapcsolas', 'soros-parhuzamos_kapcsolas', 'parhuzamos-soros_kapcsolas', 'vegyes_kapcsolas', 'visszafele_szamolas_voltmerovel'][n]}_levezetes.html`;
+
+/* segédek az egyedi levezetésekhez */
+const stp = (title, ...parts) => ({ title, html: parts.join('') });
+const fq = (f, k) => fmtQ(f, k);
+
+const BANK_SPECS = [
+  /* ---------------- A. Ohm törvénye, teljesítmény ---------------- */
+  {
+    id: 'A1', topic: 'ohm', level: 1, kind: 'ohm', title: 'Vasaló fűtőszála',
+    statement: 'Egy vasaló fűtőszálának ellenállása 52,9 Ω. Mekkora áram folyik át rajta, és mekkora a teljesítménye, ha 230 V-os hálózatra kapcsoljuk?',
+    ohm: { R: '52.9', U: 230, given: ['R', 'U'] }
+  },
+  {
+    id: 'A2', topic: 'ohm', level: 1, kind: 'ohm', title: 'Gépkocsi-izzó',
+    statement: 'Egy gépkocsi-izzó a 12 V-os fedélzeti hálózatról üzemelve 0,5 A áramot vesz fel. Mekkora az izzószál ellenállása, és mekkora a teljesítménye?',
+    ohm: { U: 12, I: '0.5', given: ['U', 'I'] }
+  },
+  {
+    id: 'A3', topic: 'ohm', level: 1, kind: 'ohm', title: 'Feszültség az ellenálláson',
+    statement: 'Egy 470 Ω-os ellenálláson 20 mA áram folyik át. Mekkora feszültség esik rajta, és mekkora a teljesítménye?',
+    ohm: { R: 470, I: '0.02', given: ['R', 'I'] }
+  },
+  {
+    id: 'A4', topic: 'ohm', level: 1, kind: 'ohm', title: 'Villanyradiátor',
+    statement: 'Egy villanyradiátor teljesítménye 1800 W, 230 V-os hálózatról üzemel. Mekkora a felvett áram, és mekkora a fűtőszál ellenállása?',
+    ohm: { U: 230, P: 1800, given: ['U', 'P'] }
+  },
+  {
+    id: 'A5', topic: 'ohm', level: 2, kind: 'ohm', title: 'Terhelhetőség',
+    statement: 'Egy 100 Ω-os ellenállás legfeljebb 25 W teljesítményt bír el tartósan. Mekkora feszültséget kapcsolhatunk rá legfeljebb, és mekkora áram folyik ilyenkor át rajta?',
+    ohm: { R: 100, P: 25, given: ['R', 'P'] }
+  },
+
+  /* ---------------- B. Soros kapcsolás ---------------- */
+  {
+    id: 'B1', topic: 'soros', level: 1, title: 'Két soros ellenállás', expr: 'R1+R2', R: [100, 200], Ug: 12,
+    statement: 'Két ellenállást sorba kötünk, és 12 V-os telepre kapcsoljuk. Számítsd ki az eredő ellenállást, az áramot és az ellenállások feszültségét!'
+  },
+  {
+    id: 'B2', topic: 'soros', level: 1, title: 'Három soros ellenállás', expr: 'R1+R2+R3', R: [120, 180, 300], Ug: 24,
+    statement: 'Három ellenállás sorosan van kötve egy 24 V-os generátorral. Számítsd ki az eredő ellenállást, az áramot és az egyes feszültségeket! Mit veszel észre a feszültségek és az ellenállások arányában?'
+  },
+  {
+    id: 'B3', topic: 'soros', level: 1, title: 'Négy egyforma ellenállás sorosan', expr: 'R1+R2+R3+R4', R: [100, 100, 100, 100], Ug: 24,
+    statement: 'Négy egyforma, 100 Ω-os ellenállást sorba kötünk, és 24 V-ra kapcsoljuk. Mekkora az eredő ellenállás, az áram, és mekkora feszültség esik egy ellenálláson?'
+  },
+  {
+    id: 'B4', topic: 'soros', level: 2, kind: 'igiven', title: 'Soros kör, az áram ismert', expr: 'R1+R2+R3', R: [150, 220, 330], Ig: '0.1',
+    statement: 'Három soros ellenálláson 100 mA áram folyik át. Mekkora a generátor feszültsége, és mekkora feszültség esik az egyes ellenállásokon?',
+    asks: ['Ug', 'U1', 'U2', 'U3']
+  },
+
+  /* ---------------- C. Párhuzamos kapcsolás ---------------- */
+  {
+    id: 'C1', topic: 'parhuzamos', level: 1, title: 'Két párhuzamos ellenállás', expr: 'R1|R2', R: [100, 150], Ug: 24,
+    statement: 'Két ellenállást párhuzamosan kötünk egy 24 V-os generátorra. Számítsd ki az eredő ellenállást, a generátor áramát és az ágáramokat!'
+  },
+  {
+    id: 'C2', topic: 'parhuzamos', level: 1, title: 'Négy egyforma ellenállás párhuzamosan', expr: 'R1|R2|R3|R4', R: [100, 100, 100, 100], Ug: 24,
+    statement: 'Négy egyforma, 100 Ω-os ellenállást párhuzamosan kötünk, és 24 V-ra kapcsoljuk. Mekkora az eredő ellenállás, a teljes áram és az ágáramok? (Általános szabály: n egyforma ellenállás eredője R/n.)'
+  },
+  {
+    id: 'C3', topic: 'parhuzamos', level: 2, title: 'Párhuzamos eredő – szorzat per összeg', expr: 'R1|R2', R: [220, 330], Ug: 12,
+    statement: 'Egy 220 Ω-os és egy 330 Ω-os ellenállást párhuzamosan kötünk, és 12 V-ot kapcsolunk rájuk. Számítsd ki az eredő ellenállást és az ágáramokat!'
+  },
+  {
+    id: 'C4', topic: 'parhuzamos', level: 2, src: 'fuzet', link: FUZET(2), title: 'Három párhuzamos ellenállás (füzet 2. feladat)',
+    expr: 'R1|R2|R3', R: [50, 150, 220], Ug: 24,
+    statement: 'A füzet 2. feladata: három ellenállás párhuzamosan van kötve a 24 V-os generátorra. Számítsd ki az egyes ellenállások feszültségét és áramát!'
+  },
+  {
+    id: 'C5', topic: 'parhuzamos', level: 3, title: 'Konyhai fogyasztók és a kismegszakító',
+    expr: 'R1|R2|R3', R: [F(52900, 1000), F(52900, 2000), F(52900, 800)], Ug: 230,
+    labels: { 1: 'R₁ (kávéfőző, 1000 W)', 2: 'R₂ (vízforraló, 2000 W)', 3: 'R₃ (mikrohullámú, 800 W)' },
+    statement: 'Egy konyhában egyszerre működik egy 1000 W-os kávéfőző, egy 2000 W-os vízforraló és egy 800 W-os mikrohullámú sütő, mind 230 V-os hálózatra kapcsolva. Mekkora áramot vesznek fel külön-külön és együtt? Megszólal-e a 16 A-es kismegszakító?',
+    data: [['Kávéfőző', '1000 W'], ['Vízforraló', '2000 W'], ['Mikrohullámú sütő', '800 W'], ['Hálózat', '230 V'], ['Kismegszakító', '16 A']],
+    asks: ['I1', 'I2', 'I3', 'Ig'],
+    extraAsks: [{ key: 'mcb', label: 'Megszólal a 16 A-es kismegszakító?', kind: 'choice', options: ['igen', 'nem'], exp: 'igen', expFr: null, unit: '' }],
+    pre: [stp('A fogyasztók ellenállása a névleges adatokból',
+      hP('A fogyasztók névleges teljesítményét és a hálózati feszültséget ismerjük, ezért az ellenállásuk P = U² / R alapján R = U² / P:'),
+      hF('R₁ = U² / P₁ = 230² / 1000 = ' + aspan(ansQ(F(52900, 1000), 'R'))),
+      hF('R₂ = U² / P₂ = 230² / 2000 = ' + aspan(ansQ(F(52900, 2000), 'R'))),
+      hF('R₃ = U² / P₃ = 230² / 800 = ' + aspan(ansQ(F(52900, 800), 'R'))),
+      hP('Ezután a három ellenállás párhuzamos kapcsolásaként számolunk tovább (mindegyiken a teljes 230 V esik).'))],
+    post: [stp('A kismegszakító', hP('Az összáram I = ' + fmtQ(F(52900, 1000).inv().add(F(52900, 2000).inv()).add(F(52900, 800).inv()).mul(230), 'A') + ', ami <strong>nagyobb</strong> a 16 A-es kismegszakító névleges áramánál, tehát a megszakító előbb-utóbb megszólal (kioldásának ideje a túláram mértékétől függ). Ezért nem szabad ennyi nagy fogyasztót egyetlen áramkörről üzemeltetni.'))]
+  },
+  {
+    id: 'C6', topic: 'osztok', level: 2, kind: 'igiven', title: 'Áramosztó két ágra', expr: 'R1|R2', R: [60, 120], Ig: 3,
+    statement: 'Két párhuzamos ellenállásra (60 Ω és 120 Ω) 3 A áramot vezetünk. Mekkora feszültség esik rajtuk, és hogyan oszlik meg az áram a két ág között?',
+    asks: ['Ug', 'I1', 'I2']
+  },
+
+  /* ---------------- D. Vegyes kapcsolás ---------------- */
+  {
+    id: 'D1', topic: 'vegyes', level: 2, title: 'Soros–párhuzamos, kerek számokkal', expr: 'R1+(R2|R3)', R: [30, 60, 60], Ug: 24,
+    statement: 'R₁ sorosan van kötve az egymással párhuzamos R₂ és R₃ ellenállással, a generátor feszültsége 24 V. Számítsd ki az eredő ellenállást, az áramot és az egyes feszültségeket és áramokat!'
+  },
+  {
+    id: 'D2', topic: 'vegyes', level: 2, src: 'fuzet', link: FUZET(3), title: 'R₁ + (R₂ ∥ R₃) – füzet 3. feladat', expr: 'R1+(R2|R3)', R: [50, 150, 220], Ug: 24,
+    statement: 'A füzet 3. feladata: R₁ sorosan kapcsolódik az R₂ ∥ R₃ párhuzamos csoporthoz, Uᵍ = 24 V. Számítsd ki az egyes ellenállások feszültségét és áramát!'
+  },
+  {
+    id: 'D3', topic: 'vegyes', level: 2, title: '(R₁ + R₂) ∥ R₃, kerek számokkal', expr: '(R1+R2)|R3', R: [40, 60, 100], Ug: 30,
+    statement: 'Az R₁ és R₂ sorosan kötött ág párhuzamos az R₃ ellenállással. A generátor feszültsége 30 V. Számítsd ki az eredő ellenállást, az áramot, valamint az egyes ellenállások feszültségét és áramát!'
+  },
+  {
+    id: 'D4', topic: 'vegyes', level: 2, src: 'fuzet', link: FUZET(4), title: '(R₁ + R₂) ∥ R₃ – füzet 4. feladat', expr: '(R1+R2)|R3', R: [50, 150, 220], Ug: 24,
+    statement: 'A füzet 4. feladata: az R₁ + R₂ soros ág párhuzamos az R₃ ellenállással, Uᵍ = 24 V. Számítsd ki az egyes ellenállások feszültségét és áramát!'
+  },
+  {
+    id: 'D5', topic: 'vegyes', level: 3, title: 'Két párhuzamos pár sorosan', expr: '(R1|R2)+(R3|R4)', R: [100, 100, 60, 120], Ug: 36,
+    statement: 'Az R₁ ∥ R₂ és az R₃ ∥ R₄ párhuzamos párok egymással sorosan vannak kötve, Uᵍ = 36 V. Számítsd ki az eredő ellenállást és minden ellenállás feszültségét és áramát!'
+  },
+  {
+    id: 'D6', topic: 'vegyes', level: 3, title: 'Két soros ellenállás és egy párhuzamos pár', expr: 'R1+R2+(R3|R4)', R: [30, 50, 60, 120], Ug: 48,
+    statement: 'R₁ és R₂ sorosan van kötve az R₃ ∥ R₄ párhuzamos párral, Uᵍ = 48 V. Számítsd ki az eredő ellenállást és minden ellenállás feszültségét és áramát!'
+  },
+  {
+    id: 'D7', topic: 'vegyes', level: 3, title: 'Két soros ág párhuzamosan', expr: '(R1+R2)|(R3+R4)', R: [40, 60, 30, 70], Ug: 50,
+    statement: 'Az R₁ + R₂ és az R₃ + R₄ soros ágak párhuzamosan kapcsolódnak a 50 V-os generátorra. Számítsd ki az eredő ellenállást, a teljes áramot, valamint az egyes ellenállások feszültségét és áramát!'
+  },
+  {
+    id: 'D8', topic: 'vegyes', level: 3, title: 'R₁ + (R₂ ∥ (R₃ + R₄))', expr: 'R1+(R2|(R3+R4))', R: [20, 60, 30, 30], Ug: 60,
+    statement: 'R₁ sorosan kapcsolódik az R₂ ellenállás és az R₃ + R₄ soros ág párhuzamos csoportjához, Uᵍ = 60 V. Számítsd ki az eredő ellenállást és minden ellenállás feszültségét és áramát!'
+  },
+  {
+    id: 'D9', topic: 'vegyes', level: 3, title: '((R₁ ∥ R₂) + R₃) ∥ R₄', expr: '((R1|R2)+R3)|R4', R: [100, 100, 50, 100], Ug: 40,
+    statement: 'Az R₁ ∥ R₂ párhuzamos pár sorosan kapcsolódik R₃-mal, és ez az ág párhuzamos az R₄ ellenállással. A generátor feszültsége 40 V. Számítsd ki az eredő ellenállást és minden ellenállás feszültségét és áramát!'
+  },
+  {
+    id: 'D10', topic: 'vegyes', level: 3, src: 'fuzet', title: 'Három soros rész (füzet példa)', expr: '(R1|R4)+R2+(R3|R5)', R: [150, 50, 200, 300, 400], Ug: 80,
+    statement: 'A kapcsolásban az R₁ ∥ R₄ párhuzamos pár, az R₂ ellenállás és az R₃ ∥ R₅ párhuzamos pár egymás után (sorosan) következik, Uᵍ = 80 V. Számítsd ki az eredő ellenállást, a teljes áramot, valamint minden ellenállás feszültségét és áramát!'
+  },
+  {
+    id: 'D11', topic: 'vegyes', level: 4, title: 'Létrahálózat öt ellenállással', expr: 'R1+(R2|(R3+(R4|R5)))', R: [10, 75, 20, 60, 60], Ug: 48,
+    statement: 'Az ábrán egy öt ellenállásból álló létrahálózat látható: R₁ sorosan kapcsolódik az R₂ ellenállás és egy további (R₃ + (R₄ ∥ R₅)) ág párhuzamos csoportjához. Számítsd ki az eredőt, az áramot, valamint minden ellenállás feszültségét és áramát! (Uᵍ = 48 V; haladj belülről kifelé.)',
+    asks: 'all'
+  },
+  {
+    id: 'D12', topic: 'vegyes', level: 4, title: 'Két párhuzamos–soros rész egymás után', expr: '((R1+R2)|R3)+(R4|(R5+R6))', R: [30, 30, 60, 60, 20, 40], Ug: 24,
+    statement: 'A kapcsolás két részből áll, amelyek egymás után következnek: (R₁ + R₂) ∥ R₃, majd R₄ ∥ (R₅ + R₆). A generátor feszültsége 24 V. Számítsd ki az eredőt, az áramot és minden ellenállás feszültségét és áramát!'
+  },
+  {
+    id: 'D13', topic: 'vegyes', level: 4, src: 'fuzet', link: FUZET(5), title: 'Hat ellenállás (füzet 5. feladat)', expr: '(R1|R2|R3)+(R4|R5)+R6', R: [50, 150, 250, 60, 120, 100], Ug: 120,
+    statement: 'A füzet 5. feladata: az R₁ ∥ R₂ ∥ R₃ csoport, az R₄ ∥ R₅ csoport és az R₆ ellenállás egymás után van kötve, Uᵍ = 120 V. Számítsd ki minden ellenállás feszültségét és áramát!'
+  },
+  {
+    id: 'D14', topic: 'vegyes', level: 5, title: 'Hét ellenállás beágyazott csoportokkal', expr: 'R1+((R2+R3)|(R4+(R5|R6)))+R7', R: [25, 60, 40, 40, 120, 120, 25], Ug: 50,
+    statement: 'R₁ és R₇ között két ág párhuzamos: az egyikben R₂ + R₃, a másikban R₄ + (R₅ ∥ R₆) van. A generátor feszültsége 50 V. Számítsd ki az eredőt, az áramot és az alább kért feszültségeket és áramokat!',
+    asks: 'some'
+  },
+  {
+    id: 'D15', topic: 'vegyes', level: 5, title: 'Szabványértékű ellenállások (E12)', expr: '(R1|R2)+((R3+R4)|R5)+R6', R: [1000, 2200, 3300, 4700, 6800, 1500], Ug: 12,
+    statement: 'Egy kapcsolásban szabványos (E12-es) értékű ellenállások szerepelnek: (R₁ ∥ R₂), majd ((R₃ + R₄) ∥ R₅), végül R₆ egymás után. Uᵍ = 12 V. A nem kerek értékeket 3–4 értékes jegyre kerekítsd!',
+    asks: 'some'
+  },
+
+  /* ---------------- E. Feszültség- és áramosztó ---------------- */
+  {
+    id: 'E1', topic: 'osztok', level: 1, title: 'Feszültségosztó terhelés nélkül', expr: 'R1+R2', R: [1000, 2000], Ug: 9,
+    statement: 'Egy 9 V-os telepre R₁ = 1 kΩ és R₂ = 2 kΩ ellenállásból feszültségosztót építünk. Mekkora a kimeneti feszültség az R₂ ellenálláson (terhelés nélkül)? Mekkora az osztóáram?',
+    asks: ['U2', 'U1', 'I1']
+  },
+  {
+    id: 'E2', topic: 'osztok', level: 3, title: 'Terhelt feszültségosztó', expr: 'R1+(R2|R3)', R: [1000, 2000, 2000], Ug: 12,
+    statement: 'Egy 12 V-os tápfeszültségű feszültségosztó R₁ = 1 kΩ és R₂ = 2 kΩ ellenállásból áll. A kimenetre (az R₂ ellenállással párhuzamosan) egy R₃ = 2 kΩ-os fogyasztót kapcsolunk. Mekkora a kimeneti feszültség terhelve, és mekkora lett volna terhelés nélkül?',
+    labels: { 3: 'R₃ (terhelés) = 2 kΩ' },
+    asks: ['U2', 'U1', 'I1', 'I2', 'I3'],
+    extraAsks: [{ key: 'Uunl', label: 'Uₖᵢ terhelés nélkül', kind: 'V', value: F(8) }],
+    post: [stp('Összehasonlítás a terheletlen esettel',
+      hP('Terhelés nélkül az R₁ és R₂ egyszerű feszültségosztót alkot:'),
+      hF('Uₖᵢ(terheletlen) = Uᵍ · R₂ / (R₁ + R₂) = 12 · 2000 / 3000 = ' + aspan('8 V')),
+      hP('A terhelés (R₃) párhuzamosan kapcsolódik R₂-vel, ezért az eredő ellenállás a kimeneten kisebb lesz (R₂₃ = 1 kΩ), és a kimeneti feszültség <strong>6 V-ra esik vissza</strong>. A terhelt feszültségosztó kimenőfeszültsége mindig kisebb a terheletlennél; minél nagyobb a terhelés árama, annál nagyobb a visszaesés.'))]
+  },
+  {
+    id: 'E3', topic: 'osztok', level: 3, kind: 'igiven', title: 'Áramosztó három ágra', expr: 'R1|R2|R3', R: [50, 100, 100], Ig: 2,
+    statement: 'Három párhuzamos ágra (50 Ω, 100 Ω és 100 Ω) 2 A áramot vezetünk. Mekkora feszültség esik az ágakon, és hogyan oszlik meg az áram?',
+    asks: ['Ug', 'Re', 'I1', 'I2', 'I3']
+  },
+
+  /* ---------------- F. Műszeres, visszafelé számolós ---------------- */
+  {
+    id: 'F1', topic: 'meter', level: 1, kind: 'meter', title: 'Voltmérő a soros körben', expr: 'R1+R2', R: [100, 200], meter: { type: 'V', leaf: 2, value: 6 },
+    statement: 'Az ábrán a voltmérő az R₂ ellenálláson 6 V-ot mutat. Mekkora a generátor feszültsége, és mekkora az áram a körben?',
+    asks: ['Ug', 'Ig', 'U1', 'I2']
+  },
+  {
+    id: 'F2', topic: 'meter', level: 2, kind: 'meter', title: 'Ampermérő a párhuzamos ágban', expr: 'R1+(R2|R3)', R: [50, 150, 100], meter: { type: 'A', leaf: 2, value: '0.2' },
+    statement: 'Az ampermérő az R₂ ellenálláson átfolyó áramot méri: 0,2 A. Számítsd ki a generátor feszültségét és az összes ellenállás feszültségét és áramát!'
+  },
+  {
+    id: 'F3', topic: 'meter', level: 2, kind: 'meter', title: 'Voltmérő a soros ellenálláson', expr: '(R1|R2)+R3', R: [60, 120, 20], meter: { type: 'V', leaf: 3, value: 8 },
+    statement: 'A voltmérő az R₃ ellenálláson 8 V-ot mutat. Számítsd ki a generátor feszültségét és az összes ellenállás feszültségét és áramát!'
+  },
+  {
+    id: 'F4', topic: 'meter', level: 2, kind: 'meter', title: 'Ampermérő három párhuzamos ágban', expr: 'R1|R2|R3', R: [100, 50, 200], meter: { type: 'A', leaf: 2, value: '0.5' },
+    statement: 'Három párhuzamos ág közül az R₂ ágában az ampermérő 0,5 A-t mutat. Mekkora a generátor feszültsége, és mekkora a generátor árama?',
+    asks: ['Ug', 'Ig', 'I1', 'I3']
+  },
+  {
+    id: 'F5', topic: 'meter', level: 3, src: 'fuzet', link: FUZET(6), title: 'Voltmérő a vegyes kapcsolásban (füzet 6. feladat)', kind: 'meter',
+    expr: 'R1+(R3|(R2+R4))', R: { 1: 120, 2: 220, 3: 80, 4: 330 }, meter: { type: 'V', leaf: 4, value: 12 },
+    statement: 'A füzet 6. feladata: a voltmérő az R₄ ellenálláson 12 V-ot mutat. Számítsd ki a generátor feszültségét (Uᵍ), valamint az összes ellenállás feszültségét és áramát! (A voltmérő ideális.)'
+  },
+  {
+    id: 'F6', topic: 'meter', level: 3, kind: 'meter', title: 'Voltmérő a közepes ellenálláson', expr: 'R1+(R2|R3)+R4', R: [40, 60, 60, 20], meter: { type: 'V', leaf: 2, value: 12 },
+    statement: 'A kapcsolásban a voltmérő az R₂ ellenálláson 12 V-ot mutat. Számítsd ki a generátor feszültségét és minden ellenállás feszültségét és áramát!'
+  },
+  {
+    id: 'F7', topic: 'meter', level: 4, kind: 'meter', title: 'Ampermérő a létrahálózat végén', expr: 'R1+(R2|(R3+(R4|R5)))', R: [10, 75, 20, 60, 60], meter: { type: 'A', leaf: 5, value: '0.18' },
+    statement: 'A létrahálózatban az ampermérő az R₅ ellenálláson átfolyó áramot méri: 0,18 A. Számítsd ki a generátor feszültségét, a generátor áramát és minden ellenállás feszültségét és áramát! (Haladj kifelé, a mérőműszertől a generátor felé.)',
+    asks: 'all'
+  },
+
+  /* ---------------- G. Teljesítmény, gyakorlati feladatok ---------------- */
+  {
+    id: 'G1', topic: 'teljesitmeny', level: 3, title: 'Két izzó sorosan', expr: 'R1+R2', R: [F(52900, 60), F(52900, 100)], Ug: 230,
+    labels: { 1: 'R₁ (60 W / 230 V)', 2: 'R₂ (100 W / 230 V)' },
+    statement: 'Egy 60 W-os és egy 100 W-os izzót (mindkettő 230 V-os) sorba kötünk, és 230 V-os hálózatra kapcsoljuk. Mekkora áram folyik a körben, mekkora feszültség jut az izzókra, mekkora teljesítményt vesz fel egy-egy izzó, és melyik izzó világít erősebben?',
+    data: [['Izzó 1', '60 W / 230 V'], ['Izzó 2', '100 W / 230 V'], ['Hálózat', '230 V']],
+    asks: ['Ig', 'U1', 'U2', 'P1', 'P2'], choice: 'P',
+    pre: [stp('Az izzók ellenállása a névleges adatokból',
+      hP('Az izzók ellenállását a névleges adatokból számoljuk (P = U² / R ⇒ R = U² / P), és feltételezzük, hogy az ellenállásuk állandó:'),
+      hF('R₁ = 230² / 60 = ' + aspan(ansQ(F(52900, 60), 'R'))),
+      hF('R₂ = 230² / 100 = ' + aspan(ansQ(F(52900, 100), 'R'))))],
+    post: [stp('A tanulság',
+      hP('Soros kapcsolásban ugyanaz az áram folyik mindkét izzón, ezért a <strong>nagyobb ellenállású</strong> izzó (a 60 W-os) vesz fel nagyobb teljesítményt (P = I² · R), vagyis az világít erősebben. Egyik izzó sem éri el a névleges teljesítményét, mert a 230 V megoszlik közöttük.'))]
+  },
+  {
+    id: 'G2', topic: 'teljesitmeny', level: 3, title: 'Ugyanaz a két izzó párhuzamosan', expr: 'R1|R2', R: [F(52900, 60), F(52900, 100)], Ug: 230,
+    labels: { 1: 'R₁ (60 W / 230 V)', 2: 'R₂ (100 W / 230 V)' },
+    statement: 'A 60 W-os és a 100 W-os izzót most párhuzamosan kötjük a 230 V-os hálózatra. Mekkora az egyes izzók teljesítménye, mekkora az összes felvett áram, és melyik világít erősebben?',
+    data: [['Izzó 1', '60 W / 230 V'], ['Izzó 2', '100 W / 230 V'], ['Hálózat', '230 V']],
+    asks: ['P1', 'P2', 'Pg', 'Ig'], choice: 'P',
+    pre: [stp('Az izzók ellenállása a névleges adatokból',
+      hP('R = U² / P:'),
+      hF('R₁ = 230² / 60 = ' + aspan(ansQ(F(52900, 60), 'R'))),
+      hF('R₂ = 230² / 100 = ' + aspan(ansQ(F(52900, 100), 'R'))))],
+    post: [stp('A tanulság', hP('Párhuzamos kapcsolásban mindkét izzón a teljes hálózati feszültség esik, ezért mindkettő pontosan a névleges teljesítményét veszi fel (60 W és 100 W), és a nagyobb teljesítményű (100 W-os) világít erősebben. A lakásban a fogyasztókat ezért kötjük párhuzamosan.'))]
+  },
+  {
+    id: 'G3', topic: 'teljesitmeny', level: 3, kind: 'custom', title: 'Elektromos sütő fokozatai',
+    statement: 'Egy elektromos sütő két fűtőszálának ellenállása R₁ = 50 Ω és R₂ = 100 Ω. A sütő 230 V-os hálózatra csatlakozik. A kapcsolóval négy fokozat állítható be: csak R₁ üzemel, csak R₂ üzemel, a két fűtőszál sorosan, illetve párhuzamosan kapcsolódik. Mekkora a sütő teljesítménye az egyes fokozatokban?',
+    custom: () => {
+      const U = F(230), R1 = F(50), R2 = F(100), U2 = U.mul(U);
+      const Pa = U2.div(R1), Pb = U2.div(R2), Rs = R1.add(R2), Ps = U2.div(Rs), Rp = R1.mul(R2).div(R1.add(R2)), Pp = U2.div(Rp);
+      return {
+        expr: 'R1|R2', R: [50, 100], Ug: 230, ugText: 'Uᵍ = 230 V',
+        data: [['R₁', '50 Ω'], ['R₂', '100 Ω'], ['U', '230 V']],
+        intro: hP('<strong>Módszer.</strong> Mindegyik fokozatban a bekapcsolt fűtőszál(ak) eredő ellenállását számoljuk ki, majd a teljesítményt P = U² / R alapján.'),
+        steps: [
+          stp('1. fokozat: csak R₁', hF(`P = U² / R₁ = 230² / 50 = ${aspan(ansQ(Pa, 'P'))}`)),
+          stp('2. fokozat: csak R₂', hF(`P = U² / R₂ = 230² / 100 = ${aspan(ansQ(Pb, 'P'))}`)),
+          stp('3. fokozat: R₁ és R₂ sorosan', hF('Rₛ = R₁ + R₂ = 50 + 100 = 150 Ω'), hF(`P = U² / Rₛ = 230² / 150 = ${aspan(ansQ(Ps, 'P'))}`)),
+          stp('4. fokozat: R₁ és R₂ párhuzamosan',
+            hF('Rₚ = (R₁ · R₂) / (R₁ + R₂) = (50 · 100) / (50 + 100) = ' + nb(Rp) + ' Ω'),
+            hF(`P = U² / Rₚ = 230² / ${nb(Rp)} = ${aspan(ansQ(Pp, 'P'))}`),
+            hWhy(`Ellenőrzés: P₁ + P₂ = ${nb(Pa)} + ${nb(Pb)} = ${nb(Pa.add(Pb))} W – párhuzamosan a két fűtőszál teljesítménye összeadódik.`, 'Megjegyzés:')),
+          stp('Összehasonlítás', hP('A legnagyobb teljesítményt a párhuzamos, a legkisebbet a soros kapcsolás adja (a kisebb eredő ellenálláshoz nagyobb áram és teljesítmény tartozik).'))
+        ],
+        asks: [
+          { key: 'Pa', label: 'P (csak R₁)', kind: 'P', value: Pa }, { key: 'Pb', label: 'P (csak R₂)', kind: 'P', value: Pb },
+          { key: 'Ps', label: 'P (soros)', kind: 'P', value: Ps }, { key: 'Pp', label: 'P (párhuzamos)', kind: 'P', value: Pp }
+        ]
+      };
+    }
+  },
+  {
+    id: 'G4', topic: 'teljesitmeny', level: 3, title: 'Vezeték feszültségesése és vesztesége', expr: 'R1+R2', R: [F(1, 2), F(52900, 2000)], Ug: 230,
+    labels: { 1: 'R₁ (vezeték) = 0,5 Ω', 2: 'R₂ (fogyasztó, 2 kW) = 26,45 Ω' },
+    statement: 'Egy 2 kW-os, 230 V-os fogyasztót hosszú vezetéken táplálunk a 230 V-os hálózatról. A vezeték (oda-vissza) ellenállása 0,5 Ω. Mekkora áram folyik, mekkora feszültség jut a fogyasztóra, mekkora a feszültségesés a vezetéken (és hány %-a ez a hálózati feszültségnek), mekkora a vezeték vesztesége?',
+    data: [['Fogyasztó', '2 kW / 230 V'], ['Vezeték', '0,5 Ω'], ['Hálózat', '230 V']],
+    asks: ['Ig', 'U2', 'U1', 'P1'],
+    extraAsks: [{ key: 'dpct', label: 'ΔU / Uᵍ', kind: '%', value: F(1, 2).div(F(1, 2).add(F(52900, 2000))).mul(100) }],
+    pre: [stp('A fogyasztó ellenállása', hP('A 2 kW-os, 230 V-os fogyasztó ellenállása: R = U² / P:'), hF('R₂ = 230² / 2000 = ' + aspan('26,45 Ω')))],
+    post: [stp('A feszültségesés százalékban', hF('ΔU / Uᵍ = U₁ / Uᵍ = ' + nb(F(1, 2).div(F(1, 2).add(F(52900, 2000))).mul(230)) + ' / 230 = ' + aspan(fmtSig(F(1, 2).div(F(1, 2).add(F(52900, 2000))).mul(100).num(), 3) + ' %')), hP('A hálózati szabvány általában legfeljebb 3–5 %-os feszültségesést enged a fogyasztóig; a vezetéken fellépő veszteségteljesítmény pedig hővé alakul (ezért kell elég nagy vezetékkeresztmetszet).'))]
+  },
+  {
+    id: 'G5', topic: 'teljesitmeny', level: 2, title: 'Teljesítmények a vegyes kapcsolásban', expr: 'R1+(R2|R3)', R: [20, 30, 60], Ug: 24,
+    statement: 'Az R₁ + (R₂ ∥ R₃) kapcsolás generátorának feszültsége 24 V. Mekkora teljesítményt vesz fel egy-egy ellenállás, és mekkora a generátor teljesítménye? Melyik ellenállás melegszik a legjobban?',
+    asks: 'power', choice: 'P'
+  },
+
+  /* ---------------- H. Hibakeresés ---------------- */
+  {
+    id: 'H1', topic: 'fault', level: 2, kind: 'fault', title: 'Három párhuzamos izzó egyike kiég', expr: 'R1|R2|R3', R: [120, 120, 120], fault: { leaf: 2, kind: 'open', Ug: 24 },
+    statement: 'Három egyforma, 120 Ω-os izzó párhuzamosan világít egy 24 V-os rendszerben. Az R₂ izzó kiég (szakadás). Mekkora a generátor árama a hiba előtt és után, és hány %-kal változik meg az áram?'
+  },
+  {
+    id: 'H2', topic: 'fault', level: 2, kind: 'fault', title: 'Soros kör egyik elemének rövidzárja', expr: 'R1+R2+R3', R: [100, 200, 300], fault: { leaf: 2, kind: 'short', Ug: 24 },
+    statement: 'Három soros ellenállás (100 Ω, 200 Ω, 300 Ω) 24 V-os generátorról üzemel. Az R₂ ellenállás kivezetései rövidre záródnak. Mekkora a generátor árama a hiba előtt és után, és hány %-kal változik meg az áram?'
+  },
+  {
+    id: 'H3', topic: 'fault', level: 3, kind: 'fault', title: 'Szakadás a párhuzamos csoportban', expr: 'R1+(R2|R3)', R: [20, 30, 60], fault: { leaf: 3, kind: 'open', Ug: 24 },
+    statement: 'Az R₁ + (R₂ ∥ R₃) kapcsolásban az R₃ ellenállás megszakad. Mekkora a generátor árama a hiba előtt és után, mekkora lesz az eredő ellenállás a hiba után, és hány %-kal változik az áram?'
+  },
+  {
+    id: 'H4', topic: 'fault', level: 3, kind: 'fault', title: 'Zárlat a soros ellenálláson', expr: 'R1+(R2|R3)', R: [20, 30, 60], fault: { leaf: 1, kind: 'short', Ug: 24 },
+    statement: 'Az R₁ + (R₂ ∥ R₃) kapcsolásban az R₁ ellenállás rövidre záródik. Mekkora a generátor árama a hiba előtt és után, és hány %-kal változik az áram? Mi lehet a gyakorlati következmény?'
+  },
+  {
+    id: 'H5', topic: 'fault', level: 3, kind: 'fault', title: 'Szakadás két párhuzamos pár sorosan', expr: '(R1|R2)+(R3|R4)', R: [60, 60, 60, 60], fault: { leaf: 1, kind: 'open', Ug: 36 },
+    statement: 'Az (R₁ ∥ R₂) + (R₃ ∥ R₄) kapcsolásban négy egyforma, 60 Ω-os ellenállás van. Az R₁ ellenállás megszakad. Mekkora a generátor árama a hiba előtt és után, és hány %-kal változik meg?'
+  },
+  {
+    id: 'H6', topic: 'fault', level: 2, kind: 'custom', title: 'Soros fényfüzér: kiégett izzó',
+    statement: 'Egy soros fényfüzér három, egyenként 100 Ω-os izzóból áll, és 24 V-os forrásra csatlakozik. Az R₂ izzó szála elszakad. Mekkora áram folyik a körben a hiba után, és mekkora feszültséget mérünk a kiégett izzó kivezetésein, illetve a másik két izzón?',
+    custom: () => {
+      const Ug = F(24);
+      return {
+        expr: 'R1+R2+R3', R: [100, 100, 100], ugText: 'Uᵍ = 24 V', igText: 'Iᵍ = ?',
+        data: [['R₁ = R₂ = R₃', '100 Ω'], ['Uᵍ', '24 V'], ['Hiba', 'R₂ szakadás']],
+        intro: hP('<strong>Módszer.</strong> Szakadásnál a körben megszakad az áramút. Soros kapcsolásban ez az egész kört érinti: sehol sem folyik áram.'),
+        steps: [
+          stp('Az áram a szakadás után', hP('A szakadt izzón nem folyik át áram, soros kapcsolásban pedig minden elemen ugyanaz az áram folyik, ezért az egész körben:'), hA('I = 0 A')),
+          stp('A feszültségek az ép izzókon', hP('Az ép izzókon nem folyik áram, ezért Ohm törvénye szerint nem is esik rajtuk feszültség:'), hF('U₁ = R₁ · I = 100 · 0 = ' + aspan('0 V')), hF('U₃ = R₃ · I = 100 · 0 = ' + aspan('0 V'))),
+          stp('A feszültség a szakadáson', hP('Kirchhoff II. törvénye szerint a körben a feszültségek összege egyenlő a generátor feszültségével: Uᵍ = U₁ + U₂ + U₃. Mivel U₁ = U₃ = 0 V:'), hF('U₂ = Uᵍ − U₁ − U₃ = 24 − 0 − 0 = ' + aspan('24 V')), hWhy('A teljes generátorfeszültség a szakadáson jelenik meg. Ezért lehet a hibás izzót feszültségmérővel megtalálni: azon az elemen mérünk a teljes feszültséget (ez a „sorosan kötött lánc hibakeresésének” alapja).', 'Gyakorlati megjegyzés:'))
+        ],
+        asks: [
+          { key: 'I', label: 'I (a hiba után)', kind: 'A', value: F(0) },
+          { key: 'U2', label: 'U₂ (a szakadt izzón)', kind: 'V', value: Ug },
+          { key: 'U1', label: 'U₁', kind: 'V', value: F(0) },
+          { key: 'U3', label: 'U₃', kind: 'V', value: F(0) }
+        ]
+      };
+    }
+  },
+
+  /* ---------------- I. Hiányzó ellenállás, méretezés ---------------- */
+  {
+    id: 'I1', topic: 'design', level: 1, kind: 'design', title: 'Hiányzó párhuzamos ellenállás', expr: 'R1|R2', R: [300, 200],
+    design: { x: 2, target: { Re: 120 }, Ug: 24 },
+    statement: 'Egy 300 Ω-os ellenállással szeretnénk egy másikat párhuzamosan kötni úgy, hogy az eredő ellenállás 120 Ω legyen. Mekkora legyen a másik ellenállás?'
+  },
+  {
+    id: 'I2', topic: 'design', level: 1, kind: 'design', title: 'Soros ellenállás adott áramhoz', expr: 'R1+R2', R: [40, 80],
+    design: { x: 2, target: { Ig: '0.2' }, Ug: 24 },
+    statement: 'Egy 40 Ω-os ellenállással sorba kötünk egy másik ellenállást úgy, hogy a 24 V-os generátor árama 0,2 A legyen. Mekkora legyen a másik ellenállás?'
+  },
+  {
+    id: 'I3', topic: 'design', level: 3, kind: 'design', title: 'Hiányzó ellenállás vegyes kapcsolásban', expr: 'R1+(R2|R3)', R: [20, 120, 60],
+    design: { x: 3, target: { Re: 60 }, Ug: 24 },
+    statement: 'Az R₁ + (R₂ ∥ R₃) kapcsolásban R₁ = 20 Ω és R₂ = 120 Ω. Mekkora legyen R₃, hogy a kapcsolás eredő ellenállása 60 Ω legyen?'
+  },
+  {
+    id: 'I4', topic: 'design', level: 2, kind: 'custom', title: 'Soros előtét-ellenállás izzóhoz',
+    statement: 'Egy 12 V-os, 5 W-os izzót 24 V-os telepről szeretnénk működtetni. Mekkora soros előtét-ellenállást kell az izzóval sorba kötni, és mekkora teljesítmény keletkezik az előtét-ellenálláson?',
+    custom: () => {
+      const Ub = F(12), Pb = F(5), Ug = F(24);
+      const I = Pb.div(Ub), Rb = Ub.div(I), Ux = Ug.sub(Ub), Rx = Ux.div(I), Px = Ux.mul(I);
+      return {
+        expr: 'R1+R2', R: [Rx, Rb], x: 1, Ug: 24, ugText: 'Uᵍ = 24 V', labels: { 2: 'Izzó (12 V, 5 W)' },
+        data: [['Izzó', '12 V / 5 W'], ['Tápfeszültség', '24 V']],
+        intro: hP('<strong>Módszer.</strong> Az izzónak a névleges 12 V-ot kell kapnia, a maradék tápfeszültség az előtét-ellenálláson esik. Soros kapcsolásban az áram közös.'),
+        steps: [
+          stp('Az izzó névleges árama', hP('Az izzó teljesítményéből és feszültségéből (P = U · I):'), hF('I = P / U = 5 / 12 = ' + aspan(ansQ(I, 'A')))),
+          stp('A feszültség az előtét-ellenálláson', hP('A 24 V-ból 12 V az izzóra jut, a többi az előtétre (Kirchhoff II.):'), hF('Uₓ = Uᵍ − Uizzó = 24 − 12 = ' + aspan('12 V'))),
+          stp('Az előtét-ellenállás', hP('Soros kapcsolásban az előtét árama is I (Ohm törvénye):'), hF(`Rₓ = Uₓ / I = 12 / ${nb(I)} = ${aspan(ansQ(Rx, 'R'))}`), hWhy('Az izzó ellenállása R = U²/P = 12²/5 = 28,8 Ω, ugyanennyi az előtét is: a feszültségek aránya 1 : 1, ezért az ellenállások is egyenlők.', 'Ellenőrzés:')),
+          stp('A teljesítmény az előtéten', hF(`Pₓ = Uₓ · I = 12 · ${nb(I)} = ${aspan(ansQ(Px, 'P'))}`), hP('Az előtét ugyanannyi teljesítményt alakít hővé, mint amennyit az izzó felvesz – ez a veszteséges módszer hátránya.'))
+        ],
+        asks: [{ key: 'Rx', label: 'Rₓ', kind: 'R', value: Rx }, { key: 'Px', label: 'Pₓ', kind: 'P', value: Px }]
+      };
+    }
+  },
+  {
+    id: 'I5', topic: 'design', level: 2, kind: 'custom', title: 'Feszültségosztó méretezése',
+    statement: 'Egy 12 V-os tápfeszültségből feszültségosztóval 5 V-ot szeretnénk előállítani (terhelés nélkül, az R₂ ellenálláson). Az egyik ellenállás R₁ = 7 kΩ. Mekkora legyen R₂, és mekkora osztóáram folyik?',
+    custom: () => {
+      const Ug = F(12), U2 = F(5), R1 = F(7000);
+      const U1 = Ug.sub(U2), I = U1.div(R1), R2 = U2.div(I);
+      return {
+        expr: 'R1+R2', R: [R1, R2], x: 2, Ug: 12, ugText: 'Uᵍ = 12 V',
+        data: [['Uᵍ', '12 V'], ['Kimenet (U₂)', '5 V'], ['R₁', '7 kΩ']],
+        intro: hP('<strong>Módszer.</strong> A feszültségosztó két soros ellenállásán ugyanaz az áram folyik, a feszültség az ellenállások arányában oszlik meg.'),
+        steps: [
+          stp('Az R₁ feszültsége', hF('U₁ = Uᵍ − U₂ = 12 − 5 = ' + aspan('7 V'))),
+          stp('Az osztóáram', hF(`I = U₁ / R₁ = 7 / 7000 = ${aspan(ansQ(I, 'A'))}`)),
+          stp('A keresett ellenállás', hF(`R₂ = U₂ / I = 5 / ${nb(I)} = ${aspan(ansQ(R2, 'R'))}`), hWhy('Másképp: U₂ / U₁ = R₂ / R₁ ⇒ R₂ = R₁ · U₂ / U₁ = 7 kΩ · 5 / 7 = 5 kΩ. A feszültségek aránya (5 : 7) megegyezik az ellenállások arányával.', 'Ellenőrzés:'))
+        ],
+        asks: [{ key: 'R2', label: 'R₂', kind: 'R', value: R2 }, { key: 'I', label: 'I', kind: 'A', value: I }]
+      };
+    }
+  },
+  {
+    id: 'I6', topic: 'design', level: 4, kind: 'custom', title: 'Voltmérő méréshatárának bővítése',
+    statement: 'Egy műszer 10 V végkitérésű feszültségmérő, belső ellenállása 10 kΩ. Mekkora soros előtét-ellenállással lehet 100 V-ig használni?',
+    custom: () => {
+      const Um = F(10), Rm = F(10000), U = F(100);
+      const Im = Um.div(Rm), Rt = U.div(Im), Rs = Rt.sub(Rm);
+      return {
+        expr: 'R1+R2', R: [Rs, Rm], x: 1, Ug: 100, ugText: 'U = 100 V', labels: { 2: 'Műszer: Rb = 10 kΩ' },
+        data: [['Végkitérés', '10 V'], ['Belső ellenállás', '10 kΩ'], ['Új méréshatár', '100 V']],
+        intro: hP('<strong>Módszer.</strong> A műszeren végkitéréskor mindig ugyanakkora (Um, Im) érték van; a többletfeszültséget az előtét-ellenállás veszi fel. Soros kapcsolásban az áram közös.'),
+        steps: [
+          stp('A végkitéréshez tartozó áram', hF(`Iₘ = Uₘ / Rₘ = 10 / 10000 = ${aspan(ansQ(Im, 'A'))}`)),
+          stp('A teljes ellenállás 100 V-nál', hP('100 V-nál is ugyanekkora áramnak kell folynia a műszeren, ezért a műszer és az előtét együttes ellenállása:'), hF(`R = U / Iₘ = 100 / ${nb(Im)} = ${aspan(ansQ(Rt, 'R'))}`)),
+          stp('Az előtét-ellenállás', hF(`Rₑ = R − Rₘ = ${nb(Rt)} − ${nb(Rm)} = ${aspan(ansQ(Rs, 'R'))}`), hWhy('Másképp: az előtéten Uₑ = 100 − 10 = 90 V esik, Rₑ = Uₑ / Iₘ = 90 / 0,001 = 90 kΩ. A méréshatár tízszerese lett, az előtét a műszer ellenállásának kilencszerese: Rₑ = (n − 1) · Rₘ.', 'Ellenőrzés:'))
+        ],
+        asks: [{ key: 'Re', label: 'Rₑ (előtét)', kind: 'R', value: Rs }]
+      };
+    }
+  },
+  {
+    id: 'I7', topic: 'design', level: 4, kind: 'custom', title: 'Ampermérő méréshatárának bővítése',
+    statement: 'Egy árammérő műszer végkitérése 1 mA, belső ellenállása 100 Ω. Mekkora söntellenállást kell vele párhuzamosan kötni, hogy 100 mA-ig lehessen mérni vele?',
+    custom: () => {
+      const Im = F(1, 1000), Rm = F(100), I = F(1, 10);
+      const Um = Im.mul(Rm), Is = I.sub(Im), Rs = Um.div(Is);
+      return {
+        expr: 'R1|R2', R: [Rm, Rs], x: 2, Ug: F(1, 10), ugText: 'U = 0,1 V', labels: { 1: 'Műszer: Rb = 100 Ω' },
+        data: [['Végkitérés', '1 mA'], ['Belső ellenállás', '100 Ω'], ['Új méréshatár', '100 mA']],
+        intro: hP('<strong>Módszer.</strong> A sönt párhuzamos a műszerrel, ezért ugyanaz a feszültség esik rajtuk. A mérendő áram nagyobb része a söntön folyik át.'),
+        steps: [
+          stp('A műszer feszültsége végkitéréskor', hF(`Uₘ = Iₘ · Rₘ = 0,001 · 100 = ${aspan(ansQ(Um, 'V'))}`)),
+          stp('A sönt árama', hP('Teljes méréshatáron a 100 mA-ből 1 mA megy a műszeren, a többi a söntön (Kirchhoff I.):'), hF(`Iₛ = I − Iₘ = 0,1 − 0,001 = ${aspan(ansQ(Is, 'A'))}`)),
+          stp('A söntellenállás', hP('A sönton ugyanaz a feszültség esik, mint a műszeren:'), hF(`Rₛ = Uₘ / Iₛ = ${nb(Um)} / ${nb(Is)} = ${aspan(ansQ(Rs, 'R'))}`), hWhy('Másképp: Rₛ = Rₘ / (n − 1) = 100 / 99 ≈ 1,01 Ω, ahol n = 100 a méréshatár-szorzó. A söntellenállás nagyon kicsi, ezért pontos kell legyen.', 'Ellenőrzés:'))
+        ],
+        asks: [{ key: 'Rs', label: 'Rₛ (sönt)', kind: 'R', value: Rs }, { key: 'Is', label: 'Iₛ', kind: 'A', value: Is }]
+      };
+    }
+  }
+];
+
+const _bankCache = new Map();
+function bankProblem(id) {
+  if (!_bankCache.has(id)) {
+    const spec = BANK_SPECS.find(s => s.id === id);
+    if (!spec) throw new Error('Nincs ilyen feladat: ' + id);
+    const pr = problemFromSpec(spec);
+    pr.id = 'B-' + id;
+    _bankCache.set(id, pr);
+  }
+  return _bankCache.get(id);
+}
+
+/* ============================================================
+   8. Felület – közös elemek: feladatkártya, ellenőrzés, tippek, megoldás
+   ============================================================ */
+const $ = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+let UID = 0;
+
+const store = {
+  get(k, d) { try { const v = window.localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { window.localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* a tárhely nem elérhető */ } }
+};
+
+/** felhasználói beállítások (nem a feladat generálását érintik) */
+const S = Object.assign({ tol: 0.01, arrows: true }, store.get('rn_prefs_v1', {}));
+const savePrefs = () => store.set('rn_prefs_v1', { tol: S.tol, arrows: S.arrows });
+
+/* ---------- pontszám ---------- */
+const SCORE_KEY = 'rn_score_v1', BANKDONE_KEY = 'rn_bankdone_v1';
+const getScore = () => Object.assign({ tried: 0, solved: 0, streak: 0, best: 0 }, store.get(SCORE_KEY, {}));
+function renderScore() {
+  const el = $('#score');
+  if (!el) return;
+  const s = getScore();
+  el.innerHTML = `<div>Megoldva: <strong>${s.solved}</strong> / ${s.tried} feladat</div>`
+    + `<div>Hibátlan sorozat: <strong>${s.streak}</strong> <span class="small">(legjobb: ${s.best})</span></div>`
+    + '<button class="btn sm" id="scoreReset" type="button">Nullázás</button>';
+  $('#scoreReset').onclick = () => { store.set(SCORE_KEY, {}); renderScore(); };
+}
+const bankDone = () => new Set(store.get(BANKDONE_KEY, []));
+function markBankDone(id) {
+  const d = bankDone();
+  d.add(id);
+  store.set(BANKDONE_KEY, Array.from(d));
+}
+
+/* ---------- megjelenítő segédek ---------- */
+const levelBadge = lv => (LEVELS[lv] ? `<span class="badge lv lv${lv}">${lv}. szint · ${LEVELS[lv].name}</span>` : '<span class="badge">Egyéni</span>');
+
+function askHtml(a, uid, i) {
+  if (a.kind === 'choice') {
+    const opts = a.options.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
+    return `<label class="ask ask-choice"><span class="alabel">${a.label}</span><select data-i="${i}" id="${uid}a${i}"><option value="">– válassz –</option>${opts}</select><span class="amark"></span></label>`;
+  }
+  return `<label class="ask"><span class="alabel">${a.label} =</span><input type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" data-i="${i}" id="${uid}a${i}" aria-label="${esc(a.label)} értéke (${a.unit})"><span class="aunit">${a.unit}</span><span class="amark"></span></label>`;
+}
+
+/** a kérdés helyes értéke szövegként, a mező mértékegységében (pl. 36,36) */
+function askValueText(a, sig) {
+  if (a.kind === 'choice') return a.exp;
+  const unitScale = a.kind === '%' ? FR1 : UNIT_SCALE[a.unit];
+  return fmtFr(a.expFr.div(unitScale), sig || 4);
+}
+function askAnswerText(a) {
+  if (a.kind === 'choice') return a.exp;
+  if (a.kind === '%') return fmtSig(a.exp, 4) + NB + '%';
+  return fmtQ(a.expFr, a.kind);
+}
+
+/** ellenőrzés: true / false / null (nem értelmezhető szám) */
+function checkAsk(a, raw, tol) {
+  if (a.kind === 'choice') return raw === '' ? null : raw === a.exp;
+  const v = parseQty(raw, a.kind, a.unit);
+  if (v === null) return null;
+  const e = a.exp;
+  if (a.kind === '%') return Math.abs(v - e) <= Math.max(Math.abs(e) * tol, 0.15);
+  return Math.abs(v - e) <= Math.max(Math.abs(e) * tol, 1e-12);
+}
+
+/** gyakori hibás értékek (ha a felhasználó ezek egyikét írja be, magyarázatot kap) */
+function mistakeCandidates(pr) {
+  if (!['forward', 'igiven', 'meter'].includes(pr.kind) || !pr.sol || !pr.sol.tree || !pr.sol.tree.U) return [];
+  const root = pr.sol.tree, leaves = rLeaves(root);
+  const out = [];
+  const add = (keys, v, msg) => { if (isFinite(v) && v > 0) out.push({ keys, v, msg }); };
+  const sumR = leaves.reduce((a, l) => a + l.r.num(), 0);
+  const parR = 1 / leaves.reduce((a, l) => a + 1 / l.r.num(), 0);
+  const Ug = root.U.num(), Ig = root.I.num();
+  if (!isLeaf(root)) {
+    add(['Re'], sumR, 'Ez az összes ellenállás összege. Csak a <strong>soros</strong> részeket szabad összeadni; a párhuzamos csoportoknál szorzat per összeg (vagy a reciprok-képlet) kell.');
+    add(['Re'], parR, 'Ez úgy jön ki, mintha minden ellenállás párhuzamos lenne. Keresd meg, melyek vannak ténylegesen <strong>sorosan</strong> (közöttük nincs elágazás)!');
+  }
+  add(['Ig'], Ug / sumR, 'Az összes ellenállás összegével osztottál. A generátor árama: Iᵍ = Uᵍ / Rₑ, ahol Rₑ az <strong>eredő</strong> ellenállás.');
+  if (pr.kind === 'meter') add(['Ug'], pr.given.meter.value.num(), 'Ez csak a műszer által mutatott érték. A generátorfeszültség ennél nagyobb, mert a feszültség a többi soros elem között is megoszlik – haladj a műszertől a generátor felé.');
+  leaves.forEach(l => {
+    add(['U' + l.i], Ug, 'Ez a teljes generátorfeszültség. Egy ellenálláson csak akkor esik ennyi, ha közvetlenül a generátorra csatlakozik; soros elemek között a feszültség <strong>megoszlik</strong>.');
+    add(['I' + l.i], Ig, 'Ez a generátor teljes árama. Párhuzamos ágakban az áram <strong>megoszlik</strong>; csak a soros részeken azonos.');
+    add(['I' + l.i], Ug / l.r.num(), 'Ez Uᵍ / R értéke, ami csak akkor jó, ha az ellenállás közvetlenül a generátorra csatlakozik. Itt az ellenálláson <strong>kisebb feszültség</strong> esik – előbb azt kell kiszámolni.');
+  });
+  return out;
+}
+
+function answersGrid(pr) {
+  return '<div class="data-grid">' + pr.asks.map(a => `<div class="datum"><span>${a.label}</span><strong class="answer">${askAnswerText(a)}</strong></div>`).join('') + '</div>';
+}
+
+const stepHtml = (s, i) => `<div class="step"><h3>${i + 1}. lépés – ${s.title}</h3>${s.html}</div>`;
+const stepsHtml = steps => steps.map(stepHtml).join('');
+
+/** a "tipp" egységei: először a módszer, aztán a lépések egyenként */
+function hintItems(pr) {
+  const items = [];
+  if (pr.sol.intro) items.push({ html: `<div class="step">${pr.sol.intro}</div>` });
+  pr.sol.steps.forEach((s, i) => items.push({ html: stepHtml(s, i) }));
+  return items;
+}
+
+function stageOptsOf(pr) {
+  const root = pr.sol.tree;
+  const m = pr.given.meter && pr.given.meter.draw !== false ? pr.given.meter : null;
+  return { meter: m, ugText: root.U ? `Uᵍ = ${fmtQ(root.U, 'V')}` : 'Uᵍ' };
+}
+
+function solutionHtml(pr, o) {
+  o = o || {};
+  const sol = pr.sol;
+  let h = '';
+  if (pr.asks.length && !o.noAnswers) h += '<h3>Végeredmények</h3>' + answersGrid(pr);
+  if (pr.kind === 'ohm') {
+    h += `<div class="diagram-wrap">${problemSvg(pr, { solved: true })}</div>`;
+  } else {
+    if (!sol.noTable && sol.tree && sol.tree.U) h += '<h3>Az eredmények összefoglalva' + (pr.kind === 'fault' ? ' (a hiba előtti állapot)' : '') + '</h3>' + resultsTableHtml(sol.tree);
+    if (pr.kind !== 'fault' && (pr.kind !== 'custom' || (sol.tree && sol.tree.U))) {
+      h += `<h3>A kapcsolás a kiszámolt értékekkel</h3><div class="big diagram-wrap">${problemSvg(pr, { solved: true, arrows: S.arrows })}</div>`;
+    }
+  }
+  if (['forward', 'igiven', 'meter'].includes(pr.kind) && !isLeaf(sol.tree)) {
+    h += '<h3>Az egyszerűsítés lépései ábrán</h3>' + figsHtml(stageFigs(sol.tree, stageOptsOf(pr)));
+  }
+  if (pr.kind === 'fault') {
+    const fv = sol.fv;
+    const ug = `Uᵍ = ${fmtQ(pr.fault.Ug, 'V')}`;
+    h += '<h3>Az eredeti és a hibás kapcsolás</h3>' + figsHtml([
+      { cap: '<strong>Eredeti kapcsolás</strong> (a hiba előtt), a számított értékekkel', svg: treeSvg(sol.tree, { ann: annUI, ugText: ug, igText: `Iᵍ = ${fmtQ(fv.Ig0, 'A')}`, arrows: S.arrows }) },
+      { cap: `<strong>Hibás kapcsolás</strong> (${'R' + subs(pr.fault.leaf)} ${pr.fault.kind === 'open' ? 'szakadás' : 'rövidzár'}), az eredeti sorszámozással`, svg: treeSvg(sol.faultTree, { ann: annUI, ugText: ug, igText: `Iᵍʹ = ${fmtQ(fv.Ig1, 'A')}`, arrows: S.arrows }) }
+    ]);
+  }
+  h += '<h3>Levezetés lépésről lépésre</h3>' + (sol.intro || '') + stepsHtml(sol.steps);
+  if (pr.note) h += hNote(pr.note, 'Megjegyzés:');
+  if (pr.link) h += `<p><a href="${esc(pr.link)}" target="_blank" rel="noopener">A füzet feladatának részletes levezetése (külön oldalon) →</a></p>`;
+  return h;
+}
+
+/* ---------- a feladatkártya felépítése és működése ---------- */
+function problemHtml(pr, uid, o) {
+  const topic = TOPIC_NAME[pr.topic] ? `<span class="badge">${TOPIC_NAME[pr.topic]}</span>` : '';
+  const src = pr.src === 'fuzet' ? '<span class="badge fz">füzet</span>' : '';
+  const data = (pr.data || []).map(([k, v]) => `<div class="datum"><span>${k}</span><strong>${v}</strong></div>`).join('');
+  const nav = o.nav ? `<button type="button" class="btn b-prev" ${o.nav.prev ? '' : 'disabled'}>◀ Előző</button><button type="button" class="btn b-next" ${o.nav.next ? '' : 'disabled'}>Következő ▶</button><span class="small">${o.nav.pos || ''}</span>` : '';
+  return `<article class="card problem" id="${uid}">
+  <div class="phead">${levelBadge(pr.level)}${topic}${src}<span class="pid">${esc(pr.id)}</span></div>
+  <h2>${pr.title}</h2>
+  <p class="stmt">${pr.statement}</p>
+  <div class="diagram-wrap">${problemSvg(pr, { arrows: S.arrows })}</div>
+  <h3>Adatok</h3>
+  <div class="data-grid">${data}</div>
+  <h3>Kérdések</h3>
+  <form class="asks" autocomplete="off" novalidate>${pr.asks.map((a, i) => askHtml(a, uid, i)).join('')}</form>
+  <div class="actions">
+    <button type="button" class="btn primary b-check">Ellenőrzés</button>
+    <button type="button" class="btn b-hint">Tipp (következő lépés)</button>
+    <button type="button" class="btn b-sol">Megoldás megmutatása</button>
+    ${o.newBtn ? '<button type="button" class="btn b-new">Új feladat</button>' : ''}
+    <button type="button" class="btn b-print">Nyomtatás</button>
+    ${nav}
+  </div>
+  <div class="feedback" role="status" aria-live="polite"></div>
+  <div class="diag"></div>
+  <div class="hints"></div>
+  <div class="solution" hidden></div>
+</article>`;
+}
+
+function mountProblem(host, pr, o) {
+  o = Object.assign({ countScore: true, newBtn: false, onNew: null, onLevelUp: null, nav: null, onPrev: null, onNext: null, onSolved: null }, o || {});
+  const uid = 'q' + (++UID);
+  host.innerHTML = problemHtml(pr, uid, o);
+  const el = host.querySelector('.problem');
+  const st = { hint: 0, tried: false, counted: false, firstTry: true, shown: false };
+  const q = s => el.querySelector(s);
+  const inputs = $$('.asks [data-i]', el);
+  const fb = q('.feedback');
+  const diagHost = q('.diag');
+  const cands = mistakeCandidates(pr);
+  const hintsHost = q('.hints'), solHost = q('.solution');
+  const items = hintItems(pr);
+  const hintBtn = q('.b-hint'), solBtn = q('.b-sol');
+
+  function setMark(inp, ok, extra) {
+    const mark = inp.parentElement.querySelector('.amark');
+    inp.classList.toggle('ok', ok === true);
+    inp.classList.toggle('bad', ok === false);
+    inp.setAttribute('aria-invalid', ok === false ? 'true' : 'false');
+    mark.className = 'amark' + (ok === true ? ' ok' : ok === false ? ' bad' : '');
+    mark.innerHTML = (ok === true ? '✓' : ok === false ? '✗' : ok === null && inp.value.trim() ? '?' : '') + (extra ? ` <small>${extra}</small>` : '');
+  }
+
+  function check() {
+    const sc = getScore();
+    let okCount = 0, empty = 0, invalid = 0;
+    const diag = [];
+    inputs.forEach(inp => {
+      const a = pr.asks[+inp.dataset.i];
+      const raw = inp.value.trim();
+      if (raw === '') { empty++; setMark(inp, null); return; }
+      const r = checkAsk(a, raw, S.tol);
+      if (r === true) okCount++; else if (r === null) invalid++;
+      if (r === false && a.kind !== 'choice') {
+        const v = parseQty(raw, a.kind, a.unit);
+        const c = cands.find(x => x.keys.includes(a.key) && Math.abs(v - x.v) <= Math.max(S.tol, 0.005) * x.v);
+        if (c && diag.length < 4) diag.push(`<div class="why"><strong>${a.label}:</strong> ${c.msg}</div>`);
+      }
+      setMark(inp, r === null ? null : r, st.shown && r !== true ? '→ ' + askValueText(a) + (a.kind === 'choice' ? '' : NB + a.unit) : '');
+    });
+    diagHost.innerHTML = diag.join('');
+    const total = pr.asks.length;
+    const allOk = okCount === total;
+    fb.className = 'feedback' + (allOk ? ' ok' : okCount < total && empty < total ? ' bad' : '');
+    if (empty === total) {
+      fb.textContent = 'Írd be a válaszaidat, majd nyomd meg az Ellenőrzés gombot. (Tizedesvessző vagy pont is jó; megadhatsz mértékegységet is, pl. 36 mA.)';
+      return;
+    }
+    if (allOk) fb.textContent = `✓ Mind a ${total} válasz helyes!` + (st.shown ? '' : ' Nézd meg a levezetést is, vagy kérj új feladatot.');
+    else fb.textContent = `${okCount} / ${total} helyes.` + (invalid ? ` ${invalid} mező nem értelmezhető számként.` : '') + (empty ? ` ${empty} mező üres.` : '') + ' A pirossal jelölteket nézd át újra, vagy kérj tippet!';
+    if (o.countScore) {
+      if (!st.tried) { st.tried = true; sc.tried++; }
+      if (allOk && !st.counted && !st.shown) {
+        st.counted = true; sc.solved++;
+        if (st.firstTry) { sc.streak++; sc.best = Math.max(sc.best, sc.streak); }
+        if (o.onSolved) o.onSolved(pr);
+        if (o.onLevelUp && st.firstTry && sc.streak >= 3 && sc.streak % 3 === 0 && pr.level >= 1 && pr.level < 5) {
+          fb.insertAdjacentHTML('beforeend', ` Már ${sc.streak} hibátlan megoldás egymás után – <button type="button" class="btn sm b-up">Próbáld ki a(z) ${pr.level + 1}. szintet!</button>`);
+          const up = fb.querySelector('.b-up');
+          if (up) up.onclick = () => o.onLevelUp(pr.level + 1);
+        }
+      } else if (!allOk && st.firstTry) { sc.streak = 0; }
+      if (!allOk) st.firstTry = false;
+      store.set(SCORE_KEY, sc);
+      renderScore();
+    }
+  }
+
+  function showSolution() {
+    if (!solHost.hidden) { solHost.hidden = true; solBtn.textContent = 'Megoldás megmutatása'; return; }
+    if (!solHost.innerHTML) solHost.innerHTML = solutionHtml(pr);
+    solHost.hidden = false;
+    hintsHost.innerHTML = '';
+    hintBtn.disabled = true;
+    st.shown = true;
+    solBtn.textContent = 'Megoldás elrejtése';
+    inputs.forEach(inp => {
+      const a = pr.asks[+inp.dataset.i];
+      const raw = inp.value.trim();
+      const r = raw === '' ? null : checkAsk(a, raw, S.tol);
+      if (r !== true) setMark(inp, r === null ? null : false, '→ ' + askValueText(a) + (a.kind === 'choice' ? '' : NB + a.unit));
+    });
+    if (o.countScore && !st.tried) { st.tried = true; const sc = getScore(); sc.tried++; sc.streak = 0; store.set(SCORE_KEY, sc); renderScore(); }
+    solHost.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function hint() {
+    if (st.hint >= items.length) return;
+    hintsHost.insertAdjacentHTML('beforeend', items[st.hint].html);
+    st.hint++;
+    if (st.hint >= items.length) { hintBtn.disabled = true; hintBtn.textContent = 'Nincs több lépés'; }
+    else hintBtn.textContent = `Tipp (következő lépés, ${st.hint}/${items.length})`;
+    if (st.firstTry && o.countScore) { st.firstTry = false; const sc = getScore(); sc.streak = 0; store.set(SCORE_KEY, sc); renderScore(); }
+  }
+
+  q('.b-check').onclick = check;
+  solBtn.onclick = showSolution;
+  hintBtn.onclick = hint;
+  q('.b-print').onclick = () => window.print();
+  if (o.newBtn && q('.b-new')) q('.b-new').onclick = () => o.onNew && o.onNew();
+  if (q('.b-prev')) q('.b-prev').onclick = () => o.onPrev && o.onPrev();
+  if (q('.b-next')) q('.b-next').onclick = () => o.onNext && o.onNext();
+  q('.asks').addEventListener('submit', e => { e.preventDefault(); check(); });
+  inputs.forEach(inp => {
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); check(); } });
+    inp.addEventListener('input', () => setMark(inp, null));
+    inp.addEventListener('change', () => { if (inp.tagName === 'SELECT') setMark(inp, null); });
+  });
+  return { el, pr, check, showSolution, hint, inputs };
+}
+
+/* ============================================================
+   9. Felület – fülek: generátor, feladatbank, kísérletező, feladatlap
+   ============================================================ */
+const TABS = ['gen', 'bank', 'lab', 'sheet', 'ref'];
+const randSeed = () => 100000 + Math.floor(Math.random() * 900000);
+const clampInt = (v, a, b, d) => { const n = parseInt(v, 10); return isFinite(n) ? Math.min(b, Math.max(a, n)) : d; };
+const numOr = (v, d) => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) && n > 0 ? n : d; };
+
+function copyText(text, msgEl) {
+  const done = ok => {
+    if (!msgEl) return;
+    msgEl.textContent = ok ? 'A link a vágólapra másolva.' : 'Másold ki kézzel: ' + text;
+    if (ok) setTimeout(() => { msgEl.textContent = ''; }, 3000);
+  };
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.remove(); done(ok);
+  };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(() => done(true), fallback);
+  else fallback();
+}
+
+function setHash(h) {
+  try { history.replaceState(null, '', h); } catch (e) { try { location.hash = h; } catch (e2) { /* nem lehetséges */ } }
+}
+
+/* ============================ GENERÁTOR ============================ */
+const KIND_DEFS = [
+  ['ohm', 'Ohm törvénye (egyetlen ellenállás)'],
+  ['forward', 'Előre számolás (a generátor feszültsége adott)'],
+  ['igiven', 'A generátor árama adott'],
+  ['meter', 'Műszeres, visszafelé számolós feladat'],
+  ['design', 'Hiányzó ellenállás meghatározása'],
+  ['fault', 'Hibakeresés (szakadás / rövidzár)']
+];
+const SHAPE_DEFS = [['series', 'Soros'], ['parallel', 'Párhuzamos'], ['mixed', 'Vegyes (soros–párhuzamos)']];
+const LEVEL_SHORT = { 1: 'Ohm, soros, párhuzamos', 2: '3 ellenállás, vegyes', 3: '4 ellenállás, műszerek', 4: '5–6 ellenállás, hibák', 5: '6–8 ellenállás, E12' };
+const ASK_DEFS = [['all', 'Minden feszültség és áram'], ['some', 'Néhány kérdés (vegyes)'], ['power', 'Teljesítmények'], ['basic', 'Csak az eredő és a generátor adatai']];
+const TOL_DEFS = [[0.001, '±0,1 %'], [0.005, '±0,5 %'], [0.01, '±1 % (alap)'], [0.02, '±2 %'], [0.05, '±5 %']];
+
+const G = { opts: defaultOpts(2), seed: randSeed(), pr: null, view: null, ready: false };
+
+function optsDiff(o) {
+  const base = defaultOpts(o.level);
+  const d = {};
+  Object.keys(base).forEach(k => { if (JSON.stringify(base[k]) !== JSON.stringify(o[k])) d[k] = o[k]; });
+  return d;
+}
+function genHash() {
+  const d = optsDiff(G.opts);
+  let h = `#/gen?l=${G.opts.level}&s=${G.seed}`;
+  if (Object.keys(d).length) h += '&o=' + encodeURIComponent(JSON.stringify(d));
+  return h;
+}
+
+function advHtml() {
+  const o = G.opts;
+  const opt = (v, t, sel) => `<option value="${v}" ${sel ? 'selected' : ''}>${t}</option>`;
+  const kinds = KIND_DEFS.map(([k, t]) => `<label><input type="checkbox" data-adv="kind" value="${k}" ${o.kinds[k] > 0 ? 'checked' : ''}> ${t}</label>`).join('');
+  const shapes = SHAPE_DEFS.map(([k, t]) => `<label><input type="checkbox" data-adv="shape" value="${k}" ${o.shapes[k] > 0 ? 'checked' : ''}> ${t}</label>`).join('');
+  return `
+  <fieldset class="field"><legend>Feladattípusok</legend><div class="checks">${kinds}</div></fieldset>
+  <fieldset class="field"><legend>Kapcsolás</legend><div class="checks">${shapes}</div>
+    <div class="inline" style="margin-top:8px"><span>Ellenállások száma:</span><input type="number" id="adv_nMin" min="1" max="8" value="${o.nMin}" aria-label="Legalább"> – <input type="number" id="adv_nMax" min="1" max="8" value="${o.nMax}" aria-label="Legfeljebb"></div>
+    <label class="field"><span>Beágyazás mélysége (vegyes kapcsolásnál)</span><select id="adv_depth">${[2, 3, 4].map(d => opt(d, d + ' szint', o.depth === d)).join('')}</select></label>
+  </fieldset>
+  <fieldset class="field"><legend>Ellenállás-értékek</legend>
+    <label class="field"><span>Értéksor</span><select id="adv_series" ${o.nice ? 'disabled' : ''}>${opt('nice', 'Kerek számok (10, 12, 15, 20, 24, 30 …)', o.series === 'nice')}${opt('E6', 'E6 szabványsor', o.series === 'E6')}${opt('E12', 'E12 szabványsor', o.series === 'E12')}</select></label>
+    <div class="inline"><span>Tartomány (Ω):</span><input type="number" id="adv_lo" min="1" value="${o.lo}" aria-label="Legkisebb érték"> – <input type="number" id="adv_hi" min="1" value="${o.hi}" aria-label="Legnagyobb érték"></div>
+    <div class="checks"><label><input type="checkbox" id="adv_nice" ${o.nice ? 'checked' : ''}> Kerek (kézzel számolható) eredmények</label></div>
+    <span class="small">Bekapcsolva a program kerek számokból (10, 12, 15, 20, 24, 30 …) választ, és úgy, hogy az eredmények is kerekek legyenek. A szabványsorokhoz (E6, E12) kapcsold ki.</span>
+  </fieldset>
+  <fieldset class="field"><legend>Generátorfeszültség</legend>
+    <div class="inline"><span>Rögzített érték (V):</span><input type="text" id="adv_ug" size="7" placeholder="automatikus" value="${o.ug === 'auto' ? '' : o.ug}" inputmode="decimal"></div>
+    <div class="inline"><span>Automatikus tartomány (V):</span><input type="number" id="adv_uMin" min="1" value="${o.uMin}" aria-label="Legkisebb"> – <input type="number" id="adv_uMax" min="1" value="${o.uMax}" aria-label="Legnagyobb"></div>
+  </fieldset>
+  <fieldset class="field"><legend>Kérdések</legend>
+    <label class="field"><span>Kérdéskészlet</span><select id="adv_asks">${ASK_DEFS.map(([v, t]) => opt(v, t, o.asks === v)).join('')}</select></label>
+    <div class="checks"><label><input type="checkbox" id="adv_choice" ${o.pChoice > 0 ? 'checked' : ''}> Kiegészítő kérdés („melyik ellenálláson a legnagyobb …?”)</label></div>
+  </fieldset>
+  <fieldset class="field"><legend>Ellenőrzés, megjelenítés</legend>
+    <label class="field"><span>Elfogadott eltérés a válaszoknál</span><select id="adv_tol">${TOL_DEFS.map(([v, t]) => opt(v, t, Math.abs(S.tol - v) < 1e-9)).join('')}</select></label>
+    <div class="checks"><label><input type="checkbox" id="adv_arrows" ${S.arrows ? 'checked' : ''}> Áramirány-nyilak a rajzon</label></div>
+  </fieldset>`;
+}
+
+function readAdv() {
+  const o = G.opts, lv = LEVELS[o.level] || LEVELS[2];
+  KIND_DEFS.forEach(([k]) => {
+    const on = $(`[data-adv=kind][value=${k}]`).checked;
+    o.kinds[k] = on ? (o.kinds[k] > 0 ? o.kinds[k] : (lv.kinds[k] || 2)) : 0;
+  });
+  if (!Object.values(o.kinds).some(w => w > 0)) { o.kinds.forward = 3; }
+  SHAPE_DEFS.forEach(([k]) => { o.shapes[k] = $(`[data-adv=shape][value=${k}]`).checked ? 1 : 0; });
+  if (!Object.values(o.shapes).some(w => w > 0)) o.shapes.mixed = 1;
+  let a = clampInt($('#adv_nMin').value, 1, 8, o.nMin), b = clampInt($('#adv_nMax').value, 1, 8, o.nMax);
+  if (a > b) [a, b] = [b, a];
+  o.nMin = a; o.nMax = b;
+  o.depth = clampInt($('#adv_depth').value, 2, 4, o.depth);
+  o.series = $('#adv_series').value;
+  let lo = numOr($('#adv_lo').value, o.lo), hi = numOr($('#adv_hi').value, o.hi);
+  if (lo > hi) [lo, hi] = [hi, lo];
+  o.lo = lo; o.hi = hi;
+  o.nice = $('#adv_nice').checked;
+  const ug = $('#adv_ug').value.trim();
+  const ugv = ug ? parseQty(ug, 'V', 'V') : null;
+  o.ug = ugv && ugv > 0 ? ugv : 'auto';
+  let um = numOr($('#adv_uMin').value, o.uMin), uM = numOr($('#adv_uMax').value, o.uMax);
+  if (um > uM) [um, uM] = [uM, um];
+  o.uMin = um; o.uMax = uM;
+  o.asks = $('#adv_asks').value;
+  o.pChoice = $('#adv_choice').checked ? 0.35 : 0;
+  S.tol = parseFloat($('#adv_tol').value);
+  S.arrows = $('#adv_arrows').checked;
+  savePrefs();
+}
+
+function renderLevelSeg() {
+  $('#levelSeg').innerHTML = [1, 2, 3, 4, 5].map(n => `<button type="button" role="radio" class="l${n}" data-l="${n}" aria-checked="${G.opts.level === n}">${n}. ${LEVELS[n].name}<small>${LEVEL_SHORT[n]}</small></button>`).join('');
+  $$('#levelSeg button').forEach(b => { b.onclick = () => { setLevel(+b.dataset.l); }; });
+}
+function updateLevelInfo() {
+  const custom = Object.keys(optsDiff(G.opts)).length > 0;
+  $('#levelDesc').textContent = LEVELS[G.opts.level].desc + (custom ? ' · Egyéni beállítások aktívak.' : '');
+  $('#optsNote').textContent = custom ? 'A beállítások eltérnek a szint alapértékeitől.' : '';
+  $$('#levelSeg button').forEach(b => b.setAttribute('aria-checked', String(+b.dataset.l === G.opts.level)));
+}
+function setLevel(n) {
+  G.opts = defaultOpts(n);
+  G.seed = randSeed();
+  $('#advGrid').innerHTML = advHtml();
+  genRender(true);
+}
+
+function genRender(scroll) {
+  const host = $('#genHost');
+  $('#seedInput').value = G.seed;
+  updateLevelInfo();
+  try {
+    G.pr = genProblem(G.opts, G.seed);
+  } catch (e) {
+    G.pr = null;
+    host.innerHTML = `<div class="card"><div class="warn"><strong>Nem sikerült feladatot generálni.</strong> ${esc(e.message)}</div></div>`;
+    return;
+  }
+  G.view = mountProblem(host, G.pr, { newBtn: true, onNew: () => { G.seed = randSeed(); genRender(true); }, onLevelUp: n => setLevel(n) });
+  setHash(genHash());
+  if (scroll) host.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function genInit() {
+  renderLevelSeg();
+  $('#advGrid').innerHTML = advHtml();
+  $('#btnNew').onclick = () => { G.seed = randSeed(); genRender(true); };
+  $('#btnLoadSeed').onclick = () => { const v = parseInt($('#seedInput').value, 10); if (isFinite(v) && v > 0) { G.seed = v; genRender(true); } };
+  $('#seedInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnLoadSeed').click(); });
+  $('#btnLink').onclick = () => copyText(location.href.split('#')[0] + genHash(), $('#linkMsg'));
+  $('#btnResetOpts').onclick = () => { G.opts = defaultOpts(G.opts.level); $('#advGrid').innerHTML = advHtml(); genRender(); };
+  $('#advGrid').addEventListener('change', e => {
+    if (e.target.id === 'adv_nice') $('#adv_series').disabled = $('#adv_nice').checked;
+    readAdv();
+    if (e.target.id === 'adv_tol') { updateLevelInfo(); return; }
+    genRender();
+  });
+  G.ready = true;
+}
+
+/** a hivatkozásból érkező beállítások ellenőrzése (típus, tartomány) – idegen link ne tudjon hibát okozni */
+function sanitizeOpts(raw, level) {
+  const o = defaultOpts(level);
+  if (!raw || typeof raw !== 'object') return o;
+  const num = (v, lo, hi, d) => { v = Number(v); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+  if (raw.kinds && typeof raw.kinds === 'object') KIND_DEFS.forEach(([k]) => { if (k in raw.kinds) o.kinds[k] = num(raw.kinds[k], 0, 10, o.kinds[k]); });
+  if (raw.shapes && typeof raw.shapes === 'object') SHAPE_DEFS.forEach(([k]) => { if (k in raw.shapes) o.shapes[k] = num(raw.shapes[k], 0, 10, o.shapes[k]); });
+  o.nMin = Math.round(num(raw.nMin, 1, 8, o.nMin)); o.nMax = Math.round(num(raw.nMax, 1, 8, o.nMax));
+  if (o.nMin > o.nMax) [o.nMin, o.nMax] = [o.nMax, o.nMin];
+  o.depth = Math.round(num(raw.depth, 2, 4, o.depth));
+  if (['nice', 'E6', 'E12'].includes(raw.series)) o.series = raw.series;
+  o.lo = num(raw.lo, 1, 1e7, o.lo); o.hi = num(raw.hi, 1, 1e7, o.hi);
+  if (o.lo > o.hi) [o.lo, o.hi] = [o.hi, o.lo];
+  if (typeof raw.nice === 'boolean') o.nice = raw.nice;
+  if (raw.ug !== undefined && raw.ug !== 'auto') { const u = Number(raw.ug); o.ug = isFinite(u) && u > 0 && u < 1e5 ? u : 'auto'; }
+  o.uMin = num(raw.uMin, 0.1, 1e5, o.uMin); o.uMax = num(raw.uMax, 0.1, 1e5, o.uMax);
+  if (o.uMin > o.uMax) [o.uMin, o.uMax] = [o.uMax, o.uMin];
+  if (['all', 'some', 'power', 'basic'].includes(raw.asks)) o.asks = raw.asks;
+  o.pChoice = num(raw.pChoice, 0, 1, o.pChoice);
+  if (!Object.values(o.kinds).some(w => w > 0)) o.kinds.forward = 3;
+  if (!Object.values(o.shapes).some(w => w > 0)) o.shapes.mixed = 1;
+  return o;
+}
+
+function applyGenParams(params) {
+  const l = parseInt(params.get('l'), 10), s = parseInt(params.get('s'), 10);
+  let changed = false;
+  if (LEVELS[l] && l !== G.opts.level) { G.opts = defaultOpts(l); changed = true; }
+  const od = params.get('o');
+  if (od) {
+    try {
+      const next = sanitizeOpts(JSON.parse(od), G.opts.level);
+      if (JSON.stringify(next) !== JSON.stringify(G.opts)) { G.opts = next; changed = true; }
+    } catch (e) { /* hibás paraméter */ }
+  }
+  if (isFinite(s) && s > 0 && s !== G.seed) { G.seed = s; changed = true; }
+  if (changed || !G.pr) { $('#advGrid').innerHTML = advHtml(); genRender(); }
+}
+
+/* ============================ FELADATBANK ============================ */
+const B = { topic: 'all', levels: new Set(), fuzet: false, ready: false, list: [], openId: null };
+
+const TOPIC_ORDER = Object.fromEntries(BANK_TOPICS.map(([k], i) => [k, i]));
+function bankFilter() {
+  return BANK_SPECS.map((s, i) => [s, i])
+    .filter(([s]) => (B.topic === 'all' || s.topic === B.topic) && (!B.levels.size || B.levels.has(s.level)) && (!B.fuzet || s.src === 'fuzet'))
+    .sort((a, b) => (TOPIC_ORDER[a[0].topic] - TOPIC_ORDER[b[0].topic]) || (a[0].level - b[0].level) || (a[1] - b[1]))
+    .map(x => x[0]);
+}
+
+function bankRender() {
+  const counts = {};
+  BANK_SPECS.forEach(s => { counts[s.topic] = (counts[s.topic] || 0) + 1; });
+  $('#bankTopics').innerHTML = `<button class="chip" type="button" data-t="all" aria-pressed="${B.topic === 'all'}">Összes<span class="n">${BANK_SPECS.length}</span></button>`
+    + BANK_TOPICS.map(([k, t]) => `<button class="chip" type="button" data-t="${k}" aria-pressed="${B.topic === k}">${t}<span class="n">${counts[k] || 0}</span></button>`).join('');
+  $('#bankLevels').innerHTML = [1, 2, 3, 4, 5].map(n => `<button class="chip" type="button" data-lv="${n}" aria-pressed="${B.levels.has(n)}">${n}. szint · ${LEVELS[n].name}</button>`).join('')
+    + `<button class="chip" type="button" data-fz="1" aria-pressed="${B.fuzet}">Füzet feladatai</button>`;
+  $$('#bankTopics .chip').forEach(c => { c.onclick = () => { B.topic = c.dataset.t; bankRender(); }; });
+  $$('#bankLevels .chip[data-lv]').forEach(c => { c.onclick = () => { const n = +c.dataset.lv; if (B.levels.has(n)) B.levels.delete(n); else B.levels.add(n); bankRender(); }; });
+  $('#bankLevels .chip[data-fz]').onclick = () => { B.fuzet = !B.fuzet; bankRender(); };
+  B.list = bankFilter();
+  const done = bankDone();
+  $('#bankCount').textContent = `${B.list.length} feladat` + (done.size ? ` · ${[...done].filter(id => BANK_SPECS.some(s => s.id === id)).length} megoldva (a böngészőben jegyezve)` : '');
+  $('#bankList').innerHTML = B.list.map(s => {
+    const pr = bankProblem(s.id);
+    const isDone = done.has(s.id);
+    return `<button type="button" class="bank-card${isDone ? ' done' : ''}" data-id="${s.id}" aria-label="${esc(pr.title)}">
+      <div class="thumb">${problemSvg(pr, { arrows: false })}</div>
+      <strong>${pr.title}</strong>
+      <div class="meta">${levelBadge(pr.level)}<span class="badge">${TOPIC_NAME[pr.topic] || ''}</span>${s.src === 'fuzet' ? '<span class="badge fz">füzet</span>' : ''}${isDone ? ' <span class="answer">✓</span>' : ''}</div>
+    </button>`;
+  }).join('') || '<p>Nincs a szűrőnek megfelelő feladat.</p>';
+  $$('#bankList .bank-card').forEach(c => { c.onclick = () => bankOpen(c.dataset.id, true); });
+  B.ready = true;
+}
+
+function bankOpen(id, scroll) {
+  if (!BANK_SPECS.some(s => s.id === id)) return;
+  if (!B.ready) bankRender();
+  if (B.openId === id && !scroll && $('#bankHost .problem')) return;
+  B.openId = id;
+  const idx = B.list.findIndex(s => s.id === id);
+  const pr = bankProblem(id);
+  const nav = idx >= 0 ? { prev: idx > 0, next: idx < B.list.length - 1, pos: `${idx + 1} / ${B.list.length}` } : null;
+  mountProblem($('#bankHost'), pr, {
+    nav,
+    onPrev: () => bankOpen(B.list[idx - 1].id, true),
+    onNext: () => bankOpen(B.list[idx + 1].id, true),
+    onSolved: () => { markBankDone(id); bankRender(); }
+  });
+  setHash('#/bank/' + id);
+  if (scroll) $('#bankHost').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ============================ KÍSÉRLETEZŐ ============================ */
+const L = { expr: 'R1+(R2|R3)', vals: {}, mode: 'Ug', leaf: 1, known: 24, open: { steps: false, figs: false }, ready: false, tree: null };
+const LAB_PRESETS = [['R1+R2', 'Soros'], ['R1|R2', 'Párhuzamos'], ['R1+(R2|R3)', 'Soros–párhuzamos'], ['(R1+R2)|R3', 'Párhuzamos–soros'],
+  ['(R1|R2)+(R3|R4)', 'Két pár sorosan'], ['R1+(R3|(R2+R4))', 'Füzet 6.'], ['R1+(R2|(R3+(R4|R5)))', 'Létra'], ['(R1|R2|R3)+(R4|R5)+R6', 'Füzet 5.']];
+const LAB_MODES = [['Ug', 'Uᵍ (a generátor feszültsége) adott'], ['Ig', 'Iᵍ (a generátor árama) adott'], ['U', 'Egy ellenállás feszültsége adott'], ['I', 'Egy ellenállás árama adott']];
+
+/** logaritmikus csúszka: pozíció (0–600) ↔ érték */
+const sliderToR = s => { const v = Math.pow(10, s / 100); return roundSigFr(Fr.of(v), 2); };
+const rToSlider = r => Math.round(100 * Math.log10(Math.max(1, r.num())));
+
+function labLeaves(expr) {
+  try { return rLeaves(parseExpr(expr)).map(l => l.i).sort((a, b) => a - b); } catch (e) { return null; }
+}
+
+function labBuildControls() {
+  const idx = labLeaves(L.expr);
+  const box = $('#labSliders');
+  if (!idx) { box.innerHTML = ''; $('#labKnown').innerHTML = ''; return; }
+  idx.forEach(i => { if (L.vals[i] === undefined) L.vals[i] = 100; });
+  box.innerHTML = '<h3>Ellenállások</h3>' + idx.map(i => `<div class="slider-row"><label for="lr${i}">R${subs(i)}</label>
+    <input type="range" id="lrs${i}" min="0" max="600" step="1" value="${rToSlider(Fr.of(L.vals[i]))}" aria-label="R${i} értéke (csúszka)">
+    <input type="text" id="lr${i}" value="${fmtQ(Fr.of(L.vals[i]), 'R')}" inputmode="decimal" aria-label="R${i} értéke"></div>`).join('');
+  idx.forEach(i => {
+    const sl = $('#lrs' + i), tx = $('#lr' + i);
+    sl.oninput = () => { const v = sliderToR(+sl.value); L.vals[i] = v; tx.value = fmtQ(v, 'R'); labRender(); };
+    tx.onchange = () => { const v = parseQty(tx.value, 'R', 'Ω'); if (v && v > 0) { L.vals[i] = Fr.of(String(v)); sl.value = rToSlider(Fr.of(String(v))); } tx.value = fmtQ(Fr.of(L.vals[i]), 'R'); labRender(); };
+  });
+  if (!idx.includes(L.leaf)) L.leaf = idx[0];
+  const modeOpts = LAB_MODES.map(([v, t]) => `<option value="${v}" ${L.mode === v ? 'selected' : ''}>${t}</option>`).join('');
+  const kind = L.mode === 'Ug' || L.mode === 'U' ? 'V' : 'A';
+  const unit = kind === 'V' ? 'V' : 'A';
+  $('#labKnown').innerHTML = `<h3>Ismert mennyiség</h3>
+    <label class="field"><span>Mi adott?</span><select id="labMode">${modeOpts}</select></label>
+    ${L.mode === 'U' || L.mode === 'I' ? `<label class="field" style="margin-top:8px"><span>Melyik ellenállásé?</span><select id="labLeaf">${idx.map(i => `<option value="${i}" ${L.leaf === i ? 'selected' : ''}>R${subs(i)}</option>`).join('')}</select></label>` : ''}
+    <div class="slider-row" style="margin-top:8px"><label for="lk">${L.mode === 'Ug' ? 'Uᵍ' : L.mode === 'Ig' ? 'Iᵍ' : L.mode === 'U' ? 'U' + subs(L.leaf) : 'I' + subs(L.leaf)}</label>
+      <input type="range" id="lks" min="-300" max="300" step="1" value="${Math.round(100 * Math.log10(Math.max(1e-3, +L.known)))}" aria-label="Az ismert érték (csúszka)">
+      <input type="text" id="lk" value="${fmtFr(Fr.of(String(L.known)), 4)} ${unit}" inputmode="decimal" aria-label="Az ismert érték"></div>`;
+  $('#labMode').onchange = () => { L.mode = $('#labMode').value; L.known = L.mode === 'Ug' ? 24 : L.mode === 'Ig' ? 0.1 : L.mode === 'U' ? 5 : 0.05; labBuildControls(); labRender(); };
+  if ($('#labLeaf')) $('#labLeaf').onchange = () => { L.leaf = +$('#labLeaf').value; labBuildControls(); labRender(); };
+  $('#lks').oninput = () => { const v = Number(Math.pow(10, +$('#lks').value / 100).toPrecision(2)); L.known = v; $('#lk').value = fmtFr(Fr.of(String(v)), 4) + ' ' + unit; labRender(); };
+  $('#lk').onchange = () => { const v = parseQty($('#lk').value, kind, unit); if (v && v > 0) { L.known = v; $('#lks').value = Math.round(100 * Math.log10(v)); } $('#lk').value = fmtFr(Fr.of(String(L.known)), 4) + ' ' + unit; labRender(); };
+}
+
+function labProblem() {
+  const tree = parseExpr(L.expr);
+  rLeaves(tree).forEach(l => { l.v = Fr.of(L.vals[l.i] === undefined ? 100 : L.vals[l.i]); });
+  prep(tree);
+  const pr = newProblem('forward', tree);
+  const kv = Fr.of(String(L.known));
+  if (L.mode === 'Ug') pr.given = { Ug: kv };
+  else if (L.mode === 'Ig') { pr.kind = 'igiven'; pr.given = { Ig: kv }; }
+  else { pr.kind = 'meter'; pr.given = { meter: { type: L.mode === 'U' ? 'V' : 'A', leaf: L.leaf, value: kv, draw: false } }; }
+  pr.sol = solveProblem(pr);
+  pr.title = 'Saját kapcsolás';
+  pr.level = 0;
+  pr.asks = [];
+  pr.id = 'lab';
+  return pr;
+}
+
+function labRender() {
+  const out = $('#labOut');
+  $('#labErr').textContent = '';
+  let pr;
+  try { pr = labProblem(); } catch (e) { $('#labErr').textContent = e.message; out.innerHTML = ''; return; }
+  const root = pr.sol.tree;
+  L.tree = root;
+  const open = L.open;
+  const grid = `<div class="data-grid">
+    <div class="datum"><span>Eredő ellenállás</span><strong class="answer">Rₑ = ${fmtQ(root.r, 'R')}</strong></div>
+    <div class="datum"><span>Generátor feszültsége</span><strong class="answer">Uᵍ = ${fmtQ(root.U, 'V')}</strong></div>
+    <div class="datum"><span>Generátor árama</span><strong class="answer">Iᵍ = ${fmtQ(root.I, 'A')}</strong></div>
+    <div class="datum"><span>Generátor teljesítménye</span><strong class="answer">Pᵍ = ${fmtQ(root.U.mul(root.I), 'P')}</strong></div></div>`;
+  let figs = '';
+  if (!isLeaf(root)) figs = `<details class="fold" id="labFigs" ${open.figs ? 'open' : ''}><summary>Az egyszerűsítés lépései ábrán</summary>${figsHtml(stageFigs(root, stageOptsOf(pr)))}</details>`;
+  out.innerHTML = `<div class="card"><h2>Eredmény</h2>${grid}
+    <h3>A kapcsolás a kiszámolt értékekkel</h3><div class="big diagram-wrap">${problemSvg(pr, { solved: true, arrows: S.arrows })}</div>
+    <h3>Összefoglaló táblázat</h3>${resultsTableHtml(root)}
+    ${figs}
+    <details class="fold" id="labSteps" ${open.steps ? 'open' : ''}><summary>Levezetés lépésről lépésre</summary>${pr.sol.intro}${stepsHtml(pr.sol.steps)}</details></div>`;
+  const f = $('#labFigs'), st = $('#labSteps');
+  if (f) f.addEventListener('toggle', () => { open.figs = f.open; });
+  st.addEventListener('toggle', () => { open.steps = st.open; });
+}
+
+function labApply() {
+  const e = $('#labExpr').value;
+  try { parseExpr(e); } catch (err) { $('#labErr').textContent = err.message; return; }
+  L.expr = e;
+  labBuildControls();
+  labRender();
+  setHash('#/lab?e=' + encodeURIComponent(L.expr));
+}
+
+function labInit() {
+  $('#labPresets').innerHTML = LAB_PRESETS.map(([e, t]) => `<button type="button" class="chip" data-e="${esc(e)}" title="${esc(e)}">${t}</button>`).join('');
+  $$('#labPresets .chip').forEach(c => { c.onclick = () => { $('#labExpr').value = c.dataset.e; labApply(); }; });
+  $('#labApply').onclick = labApply;
+  $('#labExpr').addEventListener('keydown', e => { if (e.key === 'Enter') labApply(); });
+  labBuildControls();
+  labRender();
+  L.ready = true;
+}
+
+function applyLabParams(params) {
+  const e = params.get('e');
+  if (e && e !== L.expr) { $('#labExpr').value = e; L.expr = e; try { parseExpr(e); labBuildControls(); labRender(); } catch (err) { $('#labErr').textContent = err.message; } }
+}
+
+/* ============================ FELADATLAP ============================ */
+const W = { count: 8, mode: 'graded', level: 3, seed: randSeed(), title: 'Ellenállás-hálózatok – gyakorlófeladatok', key: true, detail: false, ready: false, probs: [] };
+
+function sheetControls() {
+  const opt = (v, t, sel) => `<option value="${v}" ${sel ? 'selected' : ''}>${t}</option>`;
+  $('#sheetGrid').innerHTML = `
+  <label class="field"><span>A lap címe</span><input type="text" id="sh_title" value="${esc(W.title)}"></label>
+  <label class="field"><span>Feladatok száma</span><input type="number" id="sh_count" min="3" max="20" value="${W.count}"></label>
+  <label class="field"><span>Nehézség</span><select id="sh_mode">${opt('graded', 'Fokozatosan nehezedő (1. → 5. szint)', W.mode === 'graded')}${opt('single', 'Egyetlen szint', W.mode === 'single')}${opt('mixed', 'Vegyes (véletlen szintek)', W.mode === 'mixed')}</select></label>
+  <label class="field"><span>Szint (egyetlen szintnél)</span><select id="sh_level">${[1, 2, 3, 4, 5].map(n => opt(n, `${n}. ${LEVELS[n].name}`, W.level === n)).join('')}</select></label>
+  <label class="field"><span>Azonosító (seed)</span><input type="text" id="sh_seed" value="${W.seed}" inputmode="numeric"></label>
+  <fieldset class="field"><legend>Megoldókulcs</legend><div class="checks">
+    <label><input type="checkbox" id="sh_key" ${W.key ? 'checked' : ''}> Megoldókulcs a lap végén (új oldalon)</label>
+    <label><input type="checkbox" id="sh_detail" ${W.detail ? 'checked' : ''}> Részletes levezetésekkel</label></div></fieldset>`;
+}
+function readSheet() {
+  W.title = $('#sh_title').value.trim() || 'Gyakorlófeladatok';
+  W.count = clampInt($('#sh_count').value, 3, 20, 8);
+  W.mode = $('#sh_mode').value;
+  W.level = clampInt($('#sh_level').value, 1, 5, 3);
+  W.seed = clampInt($('#sh_seed').value, 1, 999999999, W.seed);
+  W.key = $('#sh_key').checked;
+  W.detail = $('#sh_detail').checked;
+}
+function sheetProblems() {
+  const rng = mulberry32(W.seed);
+  const probs = [];
+  for (let i = 0; i < W.count; i++) {
+    const lv = W.mode === 'single' ? W.level : W.mode === 'graded' ? Math.min(5, 1 + Math.floor(i * 5 / W.count)) : 1 + Math.floor(rng() * 5);
+    probs.push(genProblem(defaultOpts(lv), (W.seed + i * 7919) % 900000 + 1000 + lv));
+  }
+  return probs;
+}
+function wsProblem(pr, i) {
+  const lines = pr.asks.map(a => {
+    if (a.kind === 'choice') return `<div class="line" style="grid-column:1/-1">${a.label} ${a.options.map(o => '☐ ' + o).join(' &nbsp; ')}</div>`;
+    return `<div class="line">${a.label} = <i></i> ${a.unit}</div>`;
+  }).join('');
+  const data = (pr.data || []).map(([k, v]) => `${k} = <strong>${v}</strong>`).join(' &nbsp;·&nbsp; ');
+  return `<section class="wsp"><div class="wsp-h"><span class="no">${i + 1}.</span>${levelBadge(pr.level)}<strong>${pr.title}</strong></div>
+  <p>${pr.statement}</p>
+  <div class="diagram-wrap">${problemSvg(pr, { arrows: false })}</div>
+  <p class="small">${data}</p>
+  <div class="wsp-asks">${lines}</div></section>`;
+}
+function sheetRender() {
+  readSheet();
+  const out = $('#sheetOut');
+  try { W.probs = sheetProblems(); } catch (e) { out.innerHTML = `<div class="card"><div class="warn">${esc(e.message)}</div></div>`; return; }
+  const today = new Date().toLocaleDateString('hu-HU');
+  let h = `<div class="card sheet"><div class="sh-title"><h2>${esc(W.title)}</h2><div>Név: <span class="blank"></span> &nbsp; Dátum: <span class="blank" style="min-width:7em"></span></div></div>
+  <p class="small">${W.count} feladat · azonosító: ${W.seed} · ${today} Számolj mértékegységekkel, és a részeredményeket is jegyezd le. A „kerek” értékeknél a feladatok kézzel is pontosan megoldhatók.</p>
+  ${W.probs.map(wsProblem).join('')}</div>`;
+  if (W.key) {
+    h += `<div class="card sheet key"><div class="sh-title"><h2>Megoldókulcs</h2><div class="small">${esc(W.title)} · azonosító: ${W.seed}</div></div>
+    <div class="tablewrap"><table><thead><tr><th>#</th><th>Feladat</th><th>Eredmények</th></tr></thead><tbody>
+    ${W.probs.map((pr, i) => `<tr><td>${i + 1}.</td><td>${pr.title}</td><td>${pr.asks.map(a => `${a.label} = <strong>${askAnswerText(a)}</strong>`).join(' &nbsp;·&nbsp; ')}</td></tr>`).join('')}
+    </tbody></table></div>`;
+    if (W.detail) h += W.probs.map((pr, i) => `<h3>${i + 1}. feladat – ${pr.title}</h3>${stepsHtml(pr.sol.steps)}`).join('');
+    h += '</div>';
+  }
+  out.innerHTML = h;
+  $('#sheetMsg').textContent = `Kész: ${W.count} feladat.`;
+  setHash(`#/sheet?n=${W.count}&m=${W.mode}&l=${W.level}&s=${W.seed}&k=${W.key ? 1 : 0}&d=${W.detail ? 1 : 0}`);
+}
+function sheetInit() {
+  sheetControls();
+  $('#sheetGen').onclick = sheetRender;
+  $('#sheetPrint').onclick = () => { if (!W.probs.length) sheetRender(); window.print(); };
+  $('#sheetNewSeed').onclick = () => { W.seed = randSeed(); $('#sh_seed').value = W.seed; sheetRender(); };
+  $('#sheetGrid').addEventListener('change', sheetRender);
+  sheetRender();
+  W.ready = true;
+}
+function applySheetParams(params) {
+  if (!params.has('s')) return;
+  W.count = clampInt(params.get('n'), 3, 20, W.count);
+  W.mode = ['graded', 'single', 'mixed'].includes(params.get('m')) ? params.get('m') : W.mode;
+  W.level = clampInt(params.get('l'), 1, 5, W.level);
+  W.seed = clampInt(params.get('s'), 1, 999999999, W.seed);
+  W.key = params.get('k') !== '0';
+  W.detail = params.get('d') === '1';
+  if (W.ready) { sheetControls(); sheetRender(); }
+}
+
+/* ============================ ÚTVONALVÁLASZTÁS ============================ */
+function showTab(name) {
+  $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+  $$('.pane').forEach(p => { p.hidden = p.id !== 'pane-' + name; });
+  if (name === 'bank' && !B.ready) bankRender();
+  if (name === 'lab' && !L.ready) labInit();
+  if (name === 'sheet' && !W.ready) sheetInit();
+}
+
+function route() {
+  const m = /^#\/(\w+)(?:\/([\w.\-]+))?(?:\?(.*))?$/.exec(location.hash) || [];
+  const tab = TABS.includes(m[1]) ? m[1] : 'gen';
+  const param = m[2], params = new URLSearchParams(m[3] || '');
+  showTab(tab);
+  if (tab === 'gen') { if (!G.ready) genInit(); applyGenParams(params); }
+  else if (!G.ready) genInit();
+  if (tab === 'bank' && param) bankOpen(param, false);
+  if (tab === 'lab') applyLabParams(params);
+  if (tab === 'sheet') applySheetParams(params);
+}
+
+function init() {
+  $$('.tab').forEach(t => {
+    t.onclick = () => {
+      const name = t.dataset.tab;
+      showTab(name);
+      if (name === 'gen') { if (!G.ready) genInit(); if (!G.pr) genRender(); else setHash(genHash()); }
+      else setHash('#/' + name);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  });
+  renderScore();
+  window.addEventListener('hashchange', route);
+  route();
+  if (!G.pr && $('#pane-gen').hidden === false) genRender();
+}
+
+window.__RN = { S, G, B, L, W, genProblem, defaultOpts, bankProblem, BANK_SPECS, parseQty, askValueText, checkAsk, mountProblem, showTab, solveProblem, sheetRender, labRender, parseExpr, Fr, fmtQ, LEVELS };
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+})();
+</script>
+</body>
+</html>
